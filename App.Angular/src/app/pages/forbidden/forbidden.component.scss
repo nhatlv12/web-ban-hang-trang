@@ -1,0 +1,69 @@
+.error-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: var(--p-surface-ground);
+}
+
+.error-content {
+  text-align: center;
+  max-width: 500px;
+}
+
+.error-code {
+  font-size: 8rem;
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(135deg, #DC2626, #F97316);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+  animation: shake 4s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50% { transform: translateX(-3px); }
+  20%, 40% { transform: translateX(3px); }
+  60% { transform: translateX(0); }
+}
+
+.error-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(249, 115, 22, 0.1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+
+  i {
+    font-size: 2rem;
+    color: #DC2626;
+  }
+}
+
+h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--p-text-color);
+  margin-bottom: 0.75rem;
+}
+
+p {
+  color: var(--p-text-muted-color);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.error-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}

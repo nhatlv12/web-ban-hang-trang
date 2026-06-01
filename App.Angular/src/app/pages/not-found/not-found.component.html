@@ -1,0 +1,24 @@
+<div class="error-page">
+  <div class="error-content">
+    <div class="error-code">404</div>
+    <div class="error-icon">
+      <i class="pi pi-search"></i>
+    </div>
+    <h1>Không tìm thấy trang</h1>
+    <p>Trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.</p>
+    <div class="error-actions">
+      <p-button
+        label="Về trang chủ"
+        icon="pi pi-home"
+        routerLink="/"
+        [raised]="true"
+      />
+      <p-button
+        label="Quay lại"
+        icon="pi pi-arrow-left"
+        [outlined]="true"
+        (onClick)="goBack()"
+      />
+    </div>
+  </div>
+</div>

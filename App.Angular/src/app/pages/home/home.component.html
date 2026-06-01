@@ -1,0 +1,98 @@
+<div class="home-container">
+  <!-- Welcome Section -->
+  <div class="welcome-section">
+    <div class="welcome-text">
+      <h1>Xin chào, {{ authService.user()?.fullName || 'Người dùng' }} 👋</h1>
+      <p>Chào mừng bạn đến với hệ thống quản lý bán hàng.</p>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card stat-primary">
+      <div class="stat-icon">
+        <i class="pi pi-shopping-cart"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">0</span>
+        <span class="stat-label">Đơn hàng</span>
+      </div>
+    </div>
+
+    <div class="stat-card stat-success">
+      <div class="stat-icon">
+        <i class="pi pi-box"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">0</span>
+        <span class="stat-label">Sản phẩm</span>
+      </div>
+    </div>
+
+    <div class="stat-card stat-warning">
+      <div class="stat-icon">
+        <i class="pi pi-users"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">0</span>
+        <span class="stat-label">Khách hàng</span>
+      </div>
+    </div>
+
+    <div class="stat-card stat-info">
+      <div class="stat-icon">
+        <i class="pi pi-wallet"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">0đ</span>
+        <span class="stat-label">Doanh thu</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="section">
+    <h2 class="section-title">Thao tác nhanh</h2>
+    <div class="quick-actions">
+      <p-card styleClass="action-card">
+        <div class="action-content">
+          <div class="action-icon action-icon-primary">
+            <i class="pi pi-plus-circle"></i>
+          </div>
+          <h3>Thêm sản phẩm</h3>
+          <p>Tạo sản phẩm mới vào hệ thống</p>
+        </div>
+      </p-card>
+
+      <p-card styleClass="action-card">
+        <div class="action-content">
+          <div class="action-icon action-icon-success">
+            <i class="pi pi-list"></i>
+          </div>
+          <h3>Quản lý đơn hàng</h3>
+          <p>Xem và xử lý các đơn hàng</p>
+        </div>
+      </p-card>
+
+      <p-card styleClass="action-card">
+        <div class="action-content">
+          <div class="action-icon action-icon-warning">
+            <i class="pi pi-chart-bar"></i>
+          </div>
+          <h3>Báo cáo</h3>
+          <p>Xem thống kê và báo cáo doanh thu</p>
+        </div>
+      </p-card>
+
+      <p-card styleClass="action-card">
+        <div class="action-content">
+          <div class="action-icon action-icon-info">
+            <i class="pi pi-cog"></i>
+          </div>
+          <h3>Cài đặt</h3>
+          <p>Cấu hình hệ thống bán hàng</p>
+        </div>
+      </p-card>
+    </div>
+  </div>
+</div>

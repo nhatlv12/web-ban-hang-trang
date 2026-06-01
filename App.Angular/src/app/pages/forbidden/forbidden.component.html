@@ -1,0 +1,24 @@
+<div class="error-page">
+  <div class="error-content">
+    <div class="error-code">403</div>
+    <div class="error-icon">
+      <i class="pi pi-lock"></i>
+    </div>
+    <h1>Không có quyền truy cập</h1>
+    <p>Bạn không có quyền truy cập vào trang này. Vui lòng liên hệ quản trị viên nếu bạn cho rằng đây là lỗi.</p>
+    <div class="error-actions">
+      <p-button
+        label="Về trang chủ"
+        icon="pi pi-home"
+        routerLink="/"
+        [raised]="true"
+      />
+      <p-button
+        label="Đăng nhập lại"
+        icon="pi pi-sign-in"
+        [outlined]="true"
+        routerLink="/login"
+      />
+    </div>
+  </div>
+</div>

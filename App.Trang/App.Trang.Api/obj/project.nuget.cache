@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "bswx3R3Iyis=",
+  "success": true,
+  "projectFilePath": "E:\\Nhat\\web-ban-hang-trang\\App.Trang\\App.Trang.Api\\App.Trang.Api.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.7\\microsoft.aspnetcore.openapi.9.0.7.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}
