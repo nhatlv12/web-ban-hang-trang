@@ -1,0 +1,109 @@
+<div class="crud-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title"><i class="pi pi-truck bg-blue"></i> Nhà cung cấp</h1>
+      <p class="page-subtitle">Quản lý danh sách nhà cung cấp hàng hóa</p>
+    </div>
+    <p-button label="Thêm mới" icon="pi pi-plus" (onClick)="openNew()" [raised]="true" />
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon bg-indigo"><i class="pi pi-truck"></i></div>
+      <div class="stat-content"><span class="stat-value">{{ totalCount() }}</span><span class="stat-label">Tổng NCC</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon bg-emerald"><i class="pi pi-check-circle"></i></div>
+      <div class="stat-content"><span class="stat-value">{{ activeCount() }}</span><span class="stat-label">Đang hoạt động</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon bg-rose"><i class="pi pi-times-circle"></i></div>
+      <div class="stat-content"><span class="stat-value">{{ totalCount() - activeCount() }}</span><span class="stat-label">Ngừng hoạt động</span></div>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="table-card">
+    <div class="table-toolbar">
+      <div class="toolbar-left">
+        <div class="search-box"><i class="pi pi-search"></i><input pInputText placeholder="Tìm theo mã, tên, SĐT, email..." [ngModel]="searchValue()" (ngModelChange)="searchValue.set($event)" /></div>
+        <span class="filter-chip" [class.active]="filterActive() === true" (click)="setFilter(true)"><i class="pi pi-check-circle"></i> Hoạt động</span>
+        <span class="filter-chip" [class.active]="filterActive() === false" (click)="setFilter(false)"><i class="pi pi-times-circle"></i> Ngừng</span>
+      </div>
+      <div class="toolbar-right">
+        <p-button icon="pi pi-refresh" [rounded]="true" [text]="true" pTooltip="Làm mới" (onClick)="searchValue.set(''); filterActive.set(null)" />
+      </div>
+    </div>
+
+    <p-table [value]="filteredItems()" [paginator]="true" [rows]="10" [rowHover]="true" dataKey="id" [showCurrentPageReport]="true" currentPageReportTemplate="Hiển thị {first} - {last} / {totalRecords}">
+      <ng-template #header>
+        <tr>
+          <th pSortableColumn="code" style="width:110px">Mã <p-sortIcon field="code" /></th>
+          <th pSortableColumn="name">Tên nhà cung cấp <p-sortIcon field="name" /></th>
+          <th style="width:140px">Điện thoại</th>
+          <th>Email</th>
+          <th style="width:130px">Mã số thuế</th>
+          <th style="width:140px">Người liên hệ</th>
+          <th style="width:110px">Trạng thái</th>
+          <th style="width:120px">Thao tác</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-item>
+        <tr>
+          <td><span class="code-badge">{{ item.code }}</span></td>
+          <td><strong>{{ item.name }}</strong></td>
+          <td>{{ item.phone }}</td>
+          <td><a [href]="'mailto:' + item.email" style="color:var(--p-primary-color)">{{ item.email }}</a></td>
+          <td>{{ item.taxCode }}</td>
+          <td>{{ item.contactPerson }}</td>
+          <td><p-tag [value]="item.isActive ? 'Hoạt động' : 'Ngừng'" [severity]="item.isActive ? 'success' : 'danger'" /></td>
+          <td>
+            <div class="action-buttons">
+              <p-button icon="pi pi-pencil" [rounded]="true" [outlined]="true" severity="success" pTooltip="Sửa" (onClick)="editItem(item)" />
+              <p-button icon="pi pi-trash" [rounded]="true" [outlined]="true" severity="danger" pTooltip="Xóa" (onClick)="deleteItem(item)" />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr><td colspan="8"><div class="empty-message"><i class="pi pi-inbox"></i><p>Không tìm thấy nhà cung cấp nào</p></div></td></tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Dialog Form with FloatLabel -->
+  <p-dialog [(visible)]="dialogVisible" [header]="isEdit() ? '✏️ Cập nhật nhà cung cấp' : '➕ Thêm nhà cung cấp mới'" [modal]="true" [style]="{ width: '700px' }" [draggable]="false">
+    <div class="form-grid">
+      <div class="form-field">
+        <p-floatlabel variant="on"><input pInputText id="prov_code" [(ngModel)]="form.code" /><label for="prov_code">Mã NCC *</label></p-floatlabel>
+      </div>
+      <div class="form-field">
+        <p-floatlabel variant="on"><input pInputText id="prov_name" [(ngModel)]="form.name" /><label for="prov_name">Tên nhà cung cấp *</label></p-floatlabel>
+      </div>
+      <div class="form-field">
+        <p-floatlabel variant="on"><input pInputText id="prov_phone" [(ngModel)]="form.phone" /><label for="prov_phone">Điện thoại</label></p-floatlabel>
+      </div>
+      <div class="form-field">
+        <p-floatlabel variant="on"><input pInputText id="prov_email" [(ngModel)]="form.email" /><label for="prov_email">Email</label></p-floatlabel>
+      </div>
+      <div class="form-field">
+        <p-floatlabel variant="on"><input pInputText id="prov_tax" [(ngModel)]="form.taxCode" /><label for="prov_tax">Mã số thuế</label></p-floatlabel>
+      </div>
+      <div class="form-field">
+        <p-floatlabel variant="on"><input pInputText id="prov_contact" [(ngModel)]="form.contactPerson" /><label for="prov_contact">Người liên hệ</label></p-floatlabel>
+      </div>
+      <div class="form-field form-field-full">
+        <p-floatlabel variant="on"><input pInputText id="prov_addr" [(ngModel)]="form.address" /><label for="prov_addr">Địa chỉ</label></p-floatlabel>
+      </div>
+      <div class="form-field form-field-full">
+        <p-floatlabel variant="on"><textarea pTextarea id="prov_note" [(ngModel)]="form.note" rows="3" [autoResize]="true"></textarea><label for="prov_note">Ghi chú</label></p-floatlabel>
+      </div>
+    </div>
+    <ng-template #footer>
+      <p-button label="Hủy" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="dialogVisible.set(false)" />
+      <p-button [label]="isEdit() ? 'Cập nhật' : 'Tạo mới'" icon="pi pi-check" [raised]="true" (onClick)="saveItem()" />
+    </ng-template>
+  </p-dialog>
+</div>

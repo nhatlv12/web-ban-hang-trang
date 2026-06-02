@@ -1,0 +1,85 @@
+<div class="crud-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title"><i class="pi pi-th-large bg-purple"></i> Danh mục sản phẩm</h1>
+      <p class="page-subtitle">Phân loại sản phẩm theo danh mục</p>
+    </div>
+    <p-button label="Thêm mới" icon="pi pi-plus" (onClick)="openNew()" [raised]="true" />
+  </div>
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon bg-violet"><i class="pi pi-th-large"></i></div>
+      <div class="stat-content"><span class="stat-value">{{ totalCount() }}</span><span class="stat-label">Tổng danh
+          mục</span></div>
+    </div>
+  </div>
+  <div class="table-card">
+    <div class="table-toolbar">
+      <div class="toolbar-left">
+        <div class="search-box"><i class="pi pi-search"></i><input pInputText placeholder="Tìm theo mã, tên..."
+            [ngModel]="searchValue()" (ngModelChange)="searchValue.set($event)" /></div>
+      </div>
+      <div class="toolbar-right"><p-button icon="pi pi-refresh" [rounded]="true" [text]="true" pTooltip="Làm mới"
+          (onClick)="searchValue.set('')" /></div>
+    </div>
+    <p-table [value]="filteredItems()" [paginator]="true" [rows]="10" [rowHover]="true" dataKey="id"
+      [showCurrentPageReport]="true" currentPageReportTemplate="Hiển thị {first} - {last} / {totalRecords}">
+      <ng-template #header>
+        <tr>
+          <th pSortableColumn="code" style="width:100px">Mã <p-sortIcon field="code" /></th>
+          <th pSortableColumn="name">Tên danh mục <p-sortIcon field="name" /></th>
+          <th style="width:80px">Icon</th>
+          <th pSortableColumn="sortOrder" style="width:90px;text-align:center">Thứ tự <p-sortIcon field="sortOrder" />
+          </th>
+          <th style="width:110px">Trạng thái</th>
+          <th style="width:120px">Thao tác</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-item>
+        <tr>
+          <td><span class="code-badge">{{ item.code }}</span></td>
+          <td><i [class]="item.icon" style="margin-right:8px;color:var(--p-primary-color)"></i><strong>{{ item.name
+              }}</strong></td>
+          <td><code style="font-size:0.75rem;color:var(--p-text-muted-color)">{{ item.icon }}</code></td>
+          <td style="text-align:center"><p-tag [value]="'' + item.sortOrder" severity="secondary" /></td>
+          <td><p-tag [value]="item.isActive ? 'Hoạt động' : 'Ngừng'"
+              [severity]="item.isActive ? 'success' : 'danger'" /></td>
+          <td><div class="action-buttons"><p-button icon="pi pi-pencil" [rounded]="true" [outlined]="true" severity="success" pTooltip="Sửa" (onClick)="editItem(item)" /><p-button icon="pi pi-trash" [rounded]="true" [outlined]="true" severity="danger" pTooltip="Xóa" (onClick)="deleteItem(item)" /></div></td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="6">
+            <div class="empty-message"><i class="pi pi-inbox"></i>
+              <p>Không tìm thấy danh mục nào</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <p-dialog [(visible)]="dialogVisible" [header]="isEdit() ? '✏️ Cập nhật danh mục' : '➕ Thêm danh mục mới'"
+    [modal]="true" [style]="{ width: '600px' }" [draggable]="false">
+    <div class="form-grid">
+      <div class="form-field"><p-floatlabel variant="on"><input pInputText id="cat_code"
+            [(ngModel)]="form.code" /><label for="cat_code">Mã danh mục *</label></p-floatlabel></div>
+      <div class="form-field"><p-floatlabel variant="on"><input pInputText id="cat_name"
+            [(ngModel)]="form.name" /><label for="cat_name">Tên danh mục *</label></p-floatlabel></div>
+      <div class="form-field"><p-floatlabel variant="on"><input pInputText id="cat_icon"
+            [(ngModel)]="form.icon" /><label for="cat_icon">Icon (VD: pi pi-mobile)</label></p-floatlabel></div>
+      <div class="form-field"><p-floatlabel variant="on"><p-inputNumber id="cat_sort" [(ngModel)]="form.sortOrder"
+            [min]="0" /><label for="cat_sort">Thứ tự hiển thị</label></p-floatlabel></div>
+      <div class="form-field form-field-full"><p-floatlabel variant="on"><p-select id="cat_parent"
+            [(ngModel)]="form.parentId" [options]="parentOptions" optionLabel="label" optionValue="value" /><label
+            for="cat_parent">Danh mục cha</label></p-floatlabel></div>
+      <div class="form-field form-field-full"><p-floatlabel variant="on"><input pInputText id="cat_desc"
+            [(ngModel)]="form.description" /><label for="cat_desc">Mô tả</label></p-floatlabel></div>
+    </div>
+    <ng-template #footer>
+      <p-button label="Hủy" icon="pi pi-times" severity="secondary" [outlined]="true"
+        (onClick)="dialogVisible.set(false)" />
+      <p-button [label]="isEdit() ? 'Cập nhật' : 'Tạo mới'" icon="pi pi-check" [raised]="true" (onClick)="saveItem()" />
+    </ng-template>
+  </p-dialog>
+</div>

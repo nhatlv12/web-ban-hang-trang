@@ -17,7 +17,7 @@ export class CartService {
 
   /** Tổng tiền */
   readonly totalPrice = computed(() =>
-    this.cartItems().reduce((sum, item) => sum + item.product.price * item.quantity, 0)
+    this.cartItems().reduce((sum, item) => sum + item.product.sellingPrice * item.quantity, 0)
   );
 
   /** Số loại sản phẩm */
@@ -39,11 +39,11 @@ export class CartService {
     }
   }
 
-  removeFromCart(productId: number): void {
+  removeFromCart(productId: string): void {
     this.cartItems.update(items => items.filter(item => item.product.id !== productId));
   }
 
-  updateQuantity(productId: number, quantity: number): void {
+  updateQuantity(productId: string, quantity: number): void {
     if (quantity <= 0) {
       this.removeFromCart(productId);
       return;
@@ -59,7 +59,7 @@ export class CartService {
     this.cartItems.set([]);
   }
 
-  isInCart(productId: number): boolean {
+  isInCart(productId: string): boolean {
     return this.cartItems().some(item => item.product.id === productId);
   }
 }

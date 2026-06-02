@@ -11,7 +11,43 @@ export const routes: Routes = [
     path: '',
     loadComponent: () => import('./pages/home/home.component').then(m => m.Home),
     canActivate: [authGuard],
-    title: 'Trang chủ - Web Bán Hàng Trang'
+    title: 'Dashboard - Web Bán Hàng Trang'
+  },
+  {
+    path: 'providers',
+    loadComponent: () => import('./pages/providers/providers.component').then(m => m.Providers),
+    canActivate: [authGuard],
+    title: 'Nhà cung cấp - Web Bán Hàng Trang'
+  },
+  {
+    path: 'customers',
+    loadComponent: () => import('./pages/customers/customers.component').then(m => m.Customers),
+    canActivate: [authGuard],
+    title: 'Khách hàng - Web Bán Hàng Trang'
+  },
+  {
+    path: 'categories',
+    loadComponent: () => import('./pages/categories/categories.component').then(m => m.Categories),
+    canActivate: [authGuard],
+    title: 'Danh mục - Web Bán Hàng Trang'
+  },
+  {
+    path: 'products',
+    loadComponent: () => import('./pages/products/products.component').then(m => m.Products),
+    canActivate: [authGuard],
+    title: 'Sản phẩm - Web Bán Hàng Trang'
+  },
+  {
+    path: 'warehouses',
+    loadComponent: () => import('./pages/warehouses/warehouses.component').then(m => m.WareHouses),
+    canActivate: [authGuard],
+    title: 'Kho hàng - Web Bán Hàng Trang'
+  },
+  {
+    path: 'orders',
+    loadComponent: () => import('./pages/orders/orders.component').then(m => m.Orders),
+    canActivate: [authGuard],
+    title: 'Đơn hàng - Web Bán Hàng Trang'
   },
   {
     path: 'forbidden',

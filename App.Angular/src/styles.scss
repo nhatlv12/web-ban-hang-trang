@@ -11,14 +11,14 @@
 }
 
 html {
-  font-size: 14px;
+  font-size: 15px;
   scroll-behavior: smooth;
 }
 
 body {
-  font-family: var(--font-family);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--p-text-color);
-  background-color: var(--p-surface-ground);
+  background-color: #f0faf4;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
@@ -33,7 +33,7 @@ a {
   }
 }
 
-/* ===== Scrollbar Styling ===== */
+/* ===== Scrollbar ===== */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -83,10 +83,21 @@ a {
   justify-content: space-between;
 }
 
-.gap-1 { gap: 0.5rem; }
-.gap-2 { gap: 1rem; }
-.gap-3 { gap: 1.5rem; }
-.gap-4 { gap: 2rem; }
+.gap-1 {
+  gap: 0.5rem;
+}
+
+.gap-2 {
+  gap: 1rem;
+}
+
+.gap-3 {
+  gap: 1.5rem;
+}
+
+.gap-4 {
+  gap: 2rem;
+}
 
 .w-full {
   width: 100%;
@@ -105,4 +116,212 @@ a {
       background: var(--p-surface-500);
     }
   }
+}
+
+/* =================================================== */
+/* GLOBAL PRIMENG OVERRIDES — GREEN ADMIN THEME         */
+/* =================================================== */
+
+/* ===== DataTable ===== */
+.p-datatable .p-datatable-thead>tr>th {
+  background: #f0fdf4 !important;
+  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748b !important;
+  padding: 1rem 1.15rem !important;
+  border-bottom: 1.5px solid #d1fae5 !important;
+}
+
+.p-datatable .p-datatable-tbody>tr>td {
+  padding: 0.9rem 1.15rem !important;
+  font-size: 0.93rem !important;
+  color: #334155 !important;
+  border-bottom: 1px solid #ecfdf5 !important;
+}
+
+.p-datatable .p-datatable-tbody>tr:hover>td {
+  background: #ecfdf5 !important;
+}
+
+.p-paginator {
+  border-top: 1.5px solid #d1fae5 !important;
+  padding: 0.85rem !important;
+  font-size: 0.9rem !important;
+}
+
+/* ===== Dialog ===== */
+.p-dialog {
+  border-radius: 18px !important;
+  overflow: hidden;
+  border: 1.5px solid #d1fae5 !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.14) !important;
+}
+
+.p-dialog .p-dialog-header {
+  padding: 1.35rem 1.65rem !important;
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  color: #fff !important;
+  border-bottom: none !important;
+}
+
+.p-dialog .p-dialog-header .p-dialog-title {
+  color: #fff !important;
+  font-weight: 700 !important;
+  font-size: 1.15rem !important;
+}
+
+.p-dialog .p-dialog-header .p-dialog-header-icon {
+  color: rgba(255, 255, 255, 0.7) !important;
+  width: 36px !important;
+  height: 36px !important;
+}
+
+.p-dialog .p-dialog-header .p-dialog-header-icon:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.p-dialog .p-dialog-content {
+  padding: 2rem 1.65rem !important;
+}
+
+.p-dialog .p-dialog-footer {
+  padding: 1.15rem 1.65rem !important;
+  border-top: 1.5px solid #e2e8f0 !important;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+}
+
+/* ===== Float Label ===== */
+.p-floatlabel {
+  width: 100%;
+}
+
+.p-floatlabel input.p-inputtext,
+.p-floatlabel .p-select,
+.p-floatlabel .p-inputnumber,
+.p-floatlabel .p-datepicker,
+.p-floatlabel textarea.p-textarea {
+  width: 100%;
+}
+
+.p-floatlabel label {
+  font-weight: 500 !important;
+  font-size: 0.9rem !important;
+}
+
+/* ===== Inputs ===== */
+.p-inputtext,
+.p-select,
+.p-textarea,
+.p-inputnumber-input {
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  padding: 0.7rem 0.85rem !important;
+  font-size: 0.93rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.p-inputtext:hover,
+.p-select:hover,
+.p-textarea:hover,
+.p-inputnumber-input:hover {
+  border-color: #a7f3d0 !important;
+}
+
+.p-inputtext:focus,
+.p-select:focus,
+.p-textarea:focus,
+.p-inputnumber-input:focus {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12) !important;
+}
+
+/* ============================================ */
+/* BUTTONS — GREEN PREMIUM                      */
+/* ============================================ */
+
+/* -- Page Header "Thêm mới" button -- */
+.page-header .p-button {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  border: none !important;
+  color: #fff !important;
+  padding: 0.75rem 1.75rem !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35) !important;
+  transition: all 0.25s ease !important;
+  letter-spacing: 0.01em;
+}
+
+.page-header .p-button:hover {
+  background: linear-gradient(135deg, #059669, #047857) !important;
+  box-shadow: 0 6px 22px rgba(16, 185, 129, 0.45) !important;
+  transform: translateY(-2px);
+}
+
+.page-header .p-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3) !important;
+}
+
+.page-header .p-button .p-button-icon {
+  font-size: 1.05rem !important;
+}
+
+/* -- Dialog Footer "Tạo mới / Cập nhật" button -- */
+.p-dialog-footer .p-button:not(.p-button-outlined):not(.p-button-secondary) {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  border: none !important;
+  color: #fff !important;
+  padding: 0.75rem 1.75rem !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35) !important;
+}
+
+.p-dialog-footer .p-button:not(.p-button-outlined):not(.p-button-secondary):hover {
+  background: linear-gradient(135deg, #059669, #047857) !important;
+  box-shadow: 0 6px 22px rgba(16, 185, 129, 0.45) !important;
+}
+
+/* -- Dialog "Hủy" outlined button -- */
+.p-dialog-footer .p-button-outlined,
+.p-dialog-footer .p-button-secondary {
+  background: #fff !important;
+  border: 1.5px solid #e2e8f0 !important;
+  color: #64748b !important;
+  padding: 0.75rem 1.75rem !important;
+  font-weight: 700 !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+}
+
+.p-dialog-footer .p-button-outlined:hover,
+.p-dialog-footer .p-button-secondary:hover {
+  border-color: #10b981 !important;
+  color: #10b981 !important;
+  background: #ecfdf5 !important;
+}
+
+/* ============================================ */
+/* ACTION BUTTONS — Edit / Delete               */
+/* ============================================ */
+.action-buttons .p-button {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  padding: 0 !important;
+}
+
+/* Toolbar refresh/text buttons */
+.table-toolbar .p-button-text {
+  padding: 0.5rem !important;
+  box-shadow: none !important;
+  background: transparent !important;
 }

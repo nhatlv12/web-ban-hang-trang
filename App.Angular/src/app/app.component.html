@@ -1,49 +1,117 @@
 <p-toast />
+<p-confirmDialog />
 
 @if (showLayout()) {
-  <!-- Header Toolbar -->
-  <p-toolbar styleClass="app-toolbar">
-    <ng-template #start>
-      <div class="flex align-items-center gap-2">
-        <p-avatar
-          icon="pi pi-shopping-cart"
-          shape="circle"
-          styleClass="app-logo-avatar"
-        />
-        <span class="app-title">{{ title() }}</span>
+  <div class="app-shell">
+    <!-- ====== SIDEBAR ====== -->
+    <aside class="sidebar" [class.collapsed]="sidebarCollapsed()">
+      <!-- Logo -->
+      <div class="sidebar-brand">
+        <div class="brand-logo">
+          <svg lucideShoppingBag [size]="22" color="#fff"></svg>
+        </div>
+        @if (!sidebarCollapsed()) {
+          <div class="brand-text">
+            <span class="brand-name">{{ title() }}</span>
+            <span class="brand-sub">Quản lý bán hàng</span>
+          </div>
+        }
       </div>
-    </ng-template>
 
-    <ng-template #end>
-      <div class="flex align-items-center gap-1">
-        <p-button
-          [icon]="isDarkMode() ? 'pi pi-sun' : 'pi pi-moon'"
-          [rounded]="true"
-          [text]="true"
-          (onClick)="toggleDarkMode()"
-        />
-        <p-button
-          icon="pi pi-bell"
-          [rounded]="true"
-          [text]="true"
-          severity="secondary"
-        />
-        <p-avatar
-          icon="pi pi-user"
-          shape="circle"
-          styleClass="user-avatar"
-          (click)="userMenu.toggle($event)"
-        />
-        <p-menu #userMenu [model]="userMenuItems" [popup]="true" />
-      </div>
-    </ng-template>
-  </p-toolbar>
+      <!-- Navigation -->
+      <nav class="sidebar-nav">
+        @for (group of navGroups; track group.title) {
+          @if (!sidebarCollapsed()) {
+            <div class="nav-group-title">{{ group.title }}</div>
+          }
+          @for (item of group.items; track item.route) {
+            <a
+              class="nav-item"
+              [routerLink]="item.route"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: item.route === '/' }"
+              [pTooltip]="sidebarCollapsed() ? item.label : ''"
+              tooltipPosition="right"
+            >
+              <div class="nav-icon">
+                @switch (item.iconSelector) {
+                  @case ('layout-dashboard') { <svg lucideLayoutDashboard [size]="20"></svg> }
+                  @case ('truck') { <svg lucideTruck [size]="20"></svg> }
+                  @case ('users') { <svg lucideUsers [size]="20"></svg> }
+                  @case ('layout-grid') { <svg lucideLayoutGrid [size]="20"></svg> }
+                  @case ('package') { <svg lucidePackage [size]="20"></svg> }
+                  @case ('warehouse') { <svg lucideWarehouse [size]="20"></svg> }
+                  @case ('shopping-cart') { <svg lucideShoppingCart [size]="20"></svg> }
+                }
+              </div>
+              @if (!sidebarCollapsed()) {
+                <span class="nav-label">{{ item.label }}</span>
+                @if (item.badge) {
+                  <p-badge [value]="'' + item.badge" severity="danger" />
+                }
+              }
+            </a>
+          }
+        }
+      </nav>
 
-  <!-- Main Content -->
-  <main class="app-content">
-    <router-outlet />
-  </main>
+      <!-- User Section -->
+      @if (!sidebarCollapsed()) {
+        <div class="sidebar-footer">
+          <div class="user-card" (click)="userMenu.toggle($event)">
+            <p-avatar icon="pi pi-user" shape="circle" styleClass="user-avatar-sm" />
+            <div class="user-info">
+              <span class="user-name">Admin</span>
+              <span class="user-role">Quản trị viên</span>
+            </div>
+            <svg lucideChevronUp [size]="14" class="user-chevron"></svg>
+          </div>
+          <p-menu #userMenu [model]="userMenuItems" [popup]="true" />
+        </div>
+      }
+    </aside>
+
+    <!-- ====== MAIN AREA ====== -->
+    <div class="main-area">
+      <!-- Header Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="toggle-btn" (click)="toggleSidebar()">
+            @if (sidebarCollapsed()) {
+              <svg lucideAlignJustify [size]="20"></svg>
+            } @else {
+              <svg lucidePanelLeft [size]="20"></svg>
+            }
+          </button>
+        </div>
+        <div class="topbar-right">
+          <button class="topbar-icon-btn" (click)="toggleDarkMode()">
+            @if (isDarkMode()) {
+              <svg lucideSun [size]="20"></svg>
+            } @else {
+              <svg lucideMoon [size]="20"></svg>
+            }
+          </button>
+          <button class="topbar-icon-btn">
+            <svg lucideBell [size]="20"></svg>
+            <span class="notification-dot"></span>
+          </button>
+          <div class="topbar-divider"></div>
+          <div class="topbar-user" (click)="userMenu2.toggle($event)">
+            <p-avatar icon="pi pi-user" shape="circle" size="normal" styleClass="topbar-avatar" />
+            <span class="topbar-username">Admin</span>
+            <svg lucideChevronDown [size]="14"></svg>
+          </div>
+          <p-menu #userMenu2 [model]="userMenuItems" [popup]="true" />
+        </div>
+      </header>
+
+      <!-- Content -->
+      <main class="content-area">
+        <router-outlet />
+      </main>
+    </div>
+  </div>
 } @else {
-  <!-- Full-screen pages (login, 404, 403) -->
   <router-outlet />
 }

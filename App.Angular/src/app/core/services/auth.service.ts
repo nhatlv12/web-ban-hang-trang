@@ -15,7 +15,7 @@ export class AuthService {
     // TODO: Gọi API đăng nhập thật
     if (username && password) {
       this.currentUser.set({
-        id: 1,
+        id: '1',
         username,
         email: `${username}@example.com`,
         fullName: 'Người dùng',
