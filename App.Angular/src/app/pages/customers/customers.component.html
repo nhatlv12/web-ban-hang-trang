@@ -44,6 +44,7 @@
           <th pSortableColumn="fullName">Họ tên <p-sortIcon field="fullName" /></th>
           <th style="width:130px">Điện thoại</th>
           <th>Email</th>
+          <th style="width:120px">Ngày sinh</th>
           <th style="width:100px">Giới tính</th>
           <th style="width:110px">Trạng thái</th>
           <th style="width:120px">Thao tác</th>
@@ -55,6 +56,7 @@
           <td><strong>{{ item.fullName }}</strong></td>
           <td>{{ item.phone }}</td>
           <td><a [href]="'mailto:' + item.email" style="color:var(--p-primary-color)">{{ item.email }}</a></td>
+          <td>{{ item.dateOfBirth | date:'dd/MM/yyyy' }}</td>
           <td>{{ getGenderLabel(item.gender) }}</td>
           <td><p-tag [value]="item.isActive ? 'Hoạt động' : 'Ngừng'"
               [severity]="item.isActive ? 'success' : 'danger'" /></td>
@@ -68,7 +70,7 @@
       </ng-template>
       <ng-template #emptymessage>
         <tr>
-          <td colspan="7">
+          <td colspan="8">
             <div class="empty-message"><i class="pi pi-inbox"></i>
               <p>Không tìm thấy khách hàng nào</p>
             </div>
@@ -81,17 +83,23 @@
   <p-dialog [(visible)]="dialogVisible" [header]="isEdit() ? '✏️ Cập nhật khách hàng' : '➕ Thêm khách hàng mới'"
     [modal]="true" [style]="{ width: '700px' }" [draggable]="false">
     <div class="form-grid">
-      <div class="form-field"><p-floatlabel variant="on"><input pInputText id="cust_code"
-            [(ngModel)]="form.code" /><label for="cust_code">Mã KH *</label></p-floatlabel></div>
+      <div class="form-field">
+        <div class="auto-code-row">
+          <label class="toggle-switch toggle-sm"><input type="checkbox" [(ngModel)]="autoCode" /><span class="toggle-slider"></span></label>
+          <span class="auto-code-label">Tự sinh mã</span>
+        </div>
+        <p-floatlabel variant="on"><input pInputText id="cust_code" [(ngModel)]="form.code" [disabled]="autoCode" /><label for="cust_code">Mã KH</label></p-floatlabel>
+      </div>
       <div class="form-field"><p-floatlabel variant="on"><input pInputText id="cust_name"
             [(ngModel)]="form.fullName" /><label for="cust_name">Họ tên *</label></p-floatlabel></div>
       <div class="form-field"><p-floatlabel variant="on"><input pInputText id="cust_phone"
             [(ngModel)]="form.phone" /><label for="cust_phone">Điện thoại *</label></p-floatlabel></div>
       <div class="form-field"><p-floatlabel variant="on"><input pInputText id="cust_email"
             [(ngModel)]="form.email" /><label for="cust_email">Email</label></p-floatlabel></div>
-      <div class="form-field"><p-floatlabel variant="on"><p-select id="cust_gender" [(ngModel)]="form.gender"
-            [options]="genderOptions" optionLabel="label" optionValue="value" /><label for="cust_gender">Giới
-            tính</label></p-floatlabel></div>
+      <div class="form-field">
+        <label class="ss-label">Giới tính</label>
+        <app-searchable-select [(ngModel)]="form.gender" [options]="genderOptions" placeholder="Chọn giới tính..." [searchable]="false" />
+      </div>
       <div class="form-field"><p-floatlabel variant="on"><p-datepicker id="cust_dob" [(ngModel)]="form.dateOfBirth"
             dateFormat="dd/mm/yy" [showIcon]="true" /><label for="cust_dob">Ngày sinh</label></p-floatlabel></div>
       <div class="form-field form-field-full"><p-floatlabel variant="on"><input pInputText id="cust_addr"

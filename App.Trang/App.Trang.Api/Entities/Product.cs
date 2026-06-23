@@ -23,9 +23,6 @@ public class Product : BaseEntity
     /// <summary>Mã danh mục (FK)</summary>
     public Guid CategoryId { get; set; }
 
-    /// <summary>Mã nhà cung cấp (FK)</summary>
-    public Guid ProviderId { get; set; }
-
     /// <summary>Giá nhập (giá vốn)</summary>
     [Column(TypeName = "decimal(18,2)")]
     public decimal CostPrice { get; set; }
@@ -58,9 +55,6 @@ public class Product : BaseEntity
     // Navigation properties
     /// <summary>Danh mục sản phẩm</summary>
     public Category Category { get; set; } = null!;
-
-    /// <summary>Nhà cung cấp</summary>
-    public Provider Provider { get; set; } = null!;
 
     /// <summary>Thông tin kho hàng</summary>
     public WareHouse? WareHouse { get; set; }

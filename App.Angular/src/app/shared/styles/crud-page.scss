@@ -107,19 +107,70 @@
 }
 
 /* Gradient Backgrounds */
-.bg-blue { background: linear-gradient(135deg, #3b82f6, #60a5fa); box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3); }
-.bg-green { background: linear-gradient(135deg, #10b981, #34d399); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); }
-.bg-orange { background: linear-gradient(135deg, #f59e0b, #fbbf24); box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3); }
-.bg-red { background: linear-gradient(135deg, #ef4444, #f87171); box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3); }
-.bg-purple { background: linear-gradient(135deg, #8b5cf6, #a78bfa); box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3); }
-.bg-cyan { background: linear-gradient(135deg, #06b6d4, #22d3ee); box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3); }
-.bg-pink { background: linear-gradient(135deg, #ec4899, #f472b6); box-shadow: 0 4px 14px rgba(236, 72, 153, 0.3); }
-.bg-indigo { background: linear-gradient(135deg, #6366f1, #818cf8); box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3); }
-.bg-emerald { background: linear-gradient(135deg, #10b981, #34d399); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); }
-.bg-amber { background: linear-gradient(135deg, #f59e0b, #fbbf24); box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3); }
-.bg-rose { background: linear-gradient(135deg, #f43f5e, #fb7185); box-shadow: 0 4px 14px rgba(244, 63, 94, 0.3); }
-.bg-sky { background: linear-gradient(135deg, #0ea5e9, #38bdf8); box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3); }
-.bg-violet { background: linear-gradient(135deg, #8b5cf6, #a78bfa); box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3); }
+.bg-blue {
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+}
+
+.bg-green {
+  background: linear-gradient(135deg, #10b981, #34d399);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+}
+
+.bg-orange {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+}
+
+.bg-red {
+  background: linear-gradient(135deg, #ef4444, #f87171);
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
+}
+
+.bg-purple {
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
+}
+
+.bg-cyan {
+  background: linear-gradient(135deg, #06b6d4, #22d3ee);
+  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);
+}
+
+.bg-pink {
+  background: linear-gradient(135deg, #ec4899, #f472b6);
+  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.3);
+}
+
+.bg-indigo {
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+}
+
+.bg-emerald {
+  background: linear-gradient(135deg, #10b981, #34d399);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+}
+
+.bg-amber {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+}
+
+.bg-rose {
+  background: linear-gradient(135deg, #f43f5e, #fb7185);
+  box-shadow: 0 4px 14px rgba(244, 63, 94, 0.3);
+}
+
+.bg-sky {
+  background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3);
+}
+
+.bg-violet {
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
+}
 
 /* ===== Table Card ===== */
 .table-card {
@@ -206,7 +257,9 @@
   border: 1.5px solid #d1fae5;
   user-select: none;
 
-  i { font-size: 0.85rem; }
+  i {
+    font-size: 0.85rem;
+  }
 
   &:hover {
     border-color: #10b981;
@@ -237,6 +290,100 @@
 
 .form-field-full {
   grid-column: 1 / -1;
+}
+
+/* ===== Searchable Select Label ===== */
+.ss-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #64748b;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.15rem;
+}
+
+/* ===== Custom Toggle Switch ===== */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #cbd5e1;
+  border-radius: 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.toggle-switch input:checked+.toggle-slider {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+}
+
+.toggle-switch input:checked+.toggle-slider::before {
+  transform: translateX(20px);
+}
+
+.toggle-switch input:focus+.toggle-slider {
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+/* Toggle Small Variant */
+.toggle-switch.toggle-sm {
+  width: 34px;
+  height: 18px;
+}
+
+.toggle-switch.toggle-sm .toggle-slider::before {
+  height: 12px;
+  width: 12px;
+  left: 3px;
+  bottom: 3px;
+}
+
+.toggle-switch.toggle-sm input:checked+.toggle-slider::before {
+  transform: translateX(16px);
+}
+
+/* Auto-Code Row */
+.auto-code-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.35rem;
+}
+
+.auto-code-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #10b981;
+  letter-spacing: 0.02em;
 }
 
 /* ===== Code Badge ===== */
@@ -294,18 +441,274 @@
   }
 }
 
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
+/* ===== Upload Zone ===== */
+.upload-zone {
+  position: relative;
+  border: 2px dashed #d1fae5;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: #fafffe;
+  overflow: hidden;
+}
+
+.upload-zone:hover {
+  border-color: #10b981;
+  background: #ecfdf5;
+}
+
+.upload-zone-active {
+  border-color: #10b981 !important;
+  background: #ecfdf5 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+}
+
+.upload-zone-has-image {
+  padding: 0;
+  border-style: solid;
+  border-color: #d1fae5;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.upload-placeholder i {
+  font-size: 2.5rem;
+  color: #a7f3d0;
+  transition: color 0.2s ease;
+}
+
+.upload-zone:hover .upload-placeholder i {
+  color: #10b981;
+}
+
+.upload-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.upload-hint {
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.upload-preview {
+  display: block;
+  width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.upload-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  border-radius: 10px;
+}
+
+.upload-overlay i {
+  font-size: 1.5rem;
+}
+
+.upload-zone-has-image:hover .upload-overlay {
+  opacity: 1;
+}
+
+.upload-remove {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  border: 1.5px solid #fecaca;
+  border-radius: 8px;
+  background: #fff;
+  color: #ef4444;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.upload-remove:hover {
+  background: #fef2f2;
+  border-color: #ef4444;
+}
+
+.upload-remove i {
+  font-size: 0.7rem;
+}
+
+/* ======================================================= */
+/* RESPONSIVE — TABLET (≤ 1024px)                           */
+/* ======================================================= */
+@media (max-width: 1024px) {
   .form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 
+  .stats-row {
+    gap: 0.75rem;
+  }
+}
+
+/* ======================================================= */
+/* RESPONSIVE — MOBILE (≤ 768px)                            */
+/* ======================================================= */
+@media (max-width: 768px) {
+  /* --- Page Header --- */
   .page-header {
     flex-direction: column;
     align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 0.75rem;
+  }
+
+  .page-title {
+    font-size: 1.25rem;
+  }
+
+  .page-subtitle {
+    font-size: 0.8rem;
+  }
+
+  /* --- Stats --- */
+  .stats-row {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .stat-card {
+    min-width: calc(50% - 0.25rem);
+    flex: 1 1 calc(50% - 0.25rem);
+    padding: 0.75rem;
+  }
+
+  .stat-value {
+    font-size: 1.35rem;
+  }
+
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* --- Table Card --- */
+  .table-card {
+    border-radius: 12px;
+    overflow: visible;
+  }
+
+  .table-toolbar {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .toolbar-left {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .search-box {
+    width: 100%;
   }
 
   .search-box input {
     width: 100%;
+  }
+
+  .filter-chip {
+    font-size: 0.72rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  /* Table horizontal scroll inside card */
+  :host ::ng-deep .p-datatable {
+    overflow: hidden;
+    border-radius: 0 0 12px 12px;
+  }
+
+  :host ::ng-deep .p-datatable-table-container {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    max-width: calc(100vw - 2.5rem);
+  }
+
+  :host ::ng-deep .p-datatable-table {
+    min-width: 650px;
+  }
+
+  /* --- Forms / Dialogs --- */
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .form-field-full {
+    grid-column: 1 !important;
+  }
+}
+
+/* ======================================================= */
+/* RESPONSIVE — SMALL MOBILE (≤ 480px)                      */
+/* ======================================================= */
+@media (max-width: 480px) {
+  .stat-card {
+    min-width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .action-buttons {
+    gap: 0.25rem;
+  }
+
+  .code-badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.45rem;
+  }
+}
+
+/* ======================================================= */
+/* PRIMENG DIALOG — GLOBAL MOBILE OVERRIDE                  */
+/* ======================================================= */
+@media (max-width: 768px) {
+  :host ::ng-deep .p-dialog {
+    width: calc(100vw - 1rem) !important;
+    max-width: 100vw !important;
+    margin: 0.5rem !important;
+  }
+
+  :host ::ng-deep .p-dialog-content {
+    padding: 0.85rem !important;
+  }
+
+  :host ::ng-deep .p-dialog-header {
+    padding: 0.85rem 1rem !important;
+  }
+
+  :host ::ng-deep .p-dialog-footer {
+    padding: 0.65rem 0.85rem !important;
+    gap: 0.5rem;
   }
 }

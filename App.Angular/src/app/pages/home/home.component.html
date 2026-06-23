@@ -6,7 +6,7 @@
       <p>Tổng quan hoạt động kinh doanh của bạn</p>
     </div>
     <div class="welcome-right">
-      <p-select [options]="periodOptions" [(ngModel)]="selectedPeriod" optionLabel="label" optionValue="value" styleClass="period-select" />
+      <app-searchable-select class="period-select" [(ngModel)]="selectedPeriod" [options]="periodOptions" [searchable]="false" />
     </div>
   </div>
 

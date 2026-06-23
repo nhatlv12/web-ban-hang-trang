@@ -55,13 +55,22 @@
   <p-dialog [(visible)]="dialogVisible" header="🛒 Tạo đơn hàng mới" [modal]="true" [style]="{ width: '700px' }" [draggable]="false">
     <div class="form-grid">
       <div class="form-field"><p-floatlabel variant="on"><input pInputText id="ord_code" [(ngModel)]="form.code" /><label for="ord_code">Mã đơn hàng *</label></p-floatlabel></div>
-      <div class="form-field"><p-floatlabel variant="on"><p-select id="ord_type" [(ngModel)]="form.type" [options]="typeOptions" optionLabel="label" optionValue="value" /><label for="ord_type">Loại đơn hàng *</label></p-floatlabel></div>
+      <div class="form-field">
+        <label class="ss-label">Loại đơn hàng *</label>
+        <app-searchable-select [(ngModel)]="form.type" [options]="typeOptions" placeholder="Chọn loại đơn..." [searchable]="false" />
+      </div>
       <div class="form-field"><p-floatlabel variant="on"><p-datepicker id="ord_date" [(ngModel)]="form.orderDate" dateFormat="dd/mm/yy" [showIcon]="true" /><label for="ord_date">Ngày lập</label></p-floatlabel></div>
       @if (form.type === 1) {
-        <div class="form-field"><p-floatlabel variant="on"><p-select id="ord_prov" [(ngModel)]="form.providerId" [options]="providerOptions" optionLabel="label" optionValue="value" /><label for="ord_prov">Nhà cung cấp *</label></p-floatlabel></div>
+        <div class="form-field">
+          <label class="ss-label">Nhà cung cấp *</label>
+          <app-searchable-select [(ngModel)]="form.providerId" [options]="providerOptions" placeholder="Chọn nhà cung cấp..." />
+        </div>
       }
       @if (form.type === 2) {
-        <div class="form-field"><p-floatlabel variant="on"><p-select id="ord_cust" [(ngModel)]="form.customerId" [options]="customerOptions" optionLabel="label" optionValue="value" /><label for="ord_cust">Khách hàng *</label></p-floatlabel></div>
+        <div class="form-field">
+          <label class="ss-label">Khách hàng *</label>
+          <app-searchable-select [(ngModel)]="form.customerId" [options]="customerOptions" placeholder="Chọn khách hàng..." />
+        </div>
       }
       <div class="form-field"><p-floatlabel variant="on"><p-inputNumber id="ord_total" [(ngModel)]="form.totalAmount" [min]="0" mode="currency" currency="VND" locale="vi-VN" /><label for="ord_total">Tổng tiền hàng</label></p-floatlabel></div>
       <div class="form-field"><p-floatlabel variant="on"><p-inputNumber id="ord_disc" [(ngModel)]="form.discount" [min]="0" mode="currency" currency="VND" locale="vi-VN" /><label for="ord_disc">Giảm giá</label></p-floatlabel></div>

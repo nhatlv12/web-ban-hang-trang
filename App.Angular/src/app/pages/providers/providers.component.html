@@ -77,7 +77,11 @@
   <p-dialog [(visible)]="dialogVisible" [header]="isEdit() ? '✏️ Cập nhật nhà cung cấp' : '➕ Thêm nhà cung cấp mới'" [modal]="true" [style]="{ width: '700px' }" [draggable]="false">
     <div class="form-grid">
       <div class="form-field">
-        <p-floatlabel variant="on"><input pInputText id="prov_code" [(ngModel)]="form.code" /><label for="prov_code">Mã NCC *</label></p-floatlabel>
+        <div class="auto-code-row">
+          <label class="toggle-switch toggle-sm"><input type="checkbox" [(ngModel)]="autoCode" /><span class="toggle-slider"></span></label>
+          <span class="auto-code-label">Tự sinh mã</span>
+        </div>
+        <p-floatlabel variant="on"><input pInputText id="prov_code" [(ngModel)]="form.code" [disabled]="autoCode" /><label for="prov_code">Mã NCC</label></p-floatlabel>
       </div>
       <div class="form-field">
         <p-floatlabel variant="on"><input pInputText id="prov_name" [(ngModel)]="form.name" /><label for="prov_name">Tên nhà cung cấp *</label></p-floatlabel>

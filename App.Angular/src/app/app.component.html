@@ -1,10 +1,10 @@
-<p-toast />
+<p-toast position="top-right" />
 <p-confirmDialog />
 
 @if (showLayout()) {
   <div class="app-shell">
     <!-- ====== SIDEBAR ====== -->
-    <aside class="sidebar" [class.collapsed]="sidebarCollapsed()">
+    <aside class="sidebar" [class.collapsed]="sidebarCollapsed()" [class.mobile-open]="mobileMenuOpen()">
       <!-- Logo -->
       <div class="sidebar-brand">
         <div class="brand-logo">
@@ -32,6 +32,7 @@
               [routerLinkActiveOptions]="{ exact: item.route === '/' }"
               [pTooltip]="sidebarCollapsed() ? item.label : ''"
               tooltipPosition="right"
+              (click)="onNavClick()"
             >
               <div class="nav-icon">
                 @switch (item.iconSelector) {
@@ -66,10 +67,15 @@
             </div>
             <svg lucideChevronUp [size]="14" class="user-chevron"></svg>
           </div>
-          <p-menu #userMenu [model]="userMenuItems" [popup]="true" />
+          <p-menu #userMenu [model]="userMenuItems" [popup]="true" appendTo="body" />
         </div>
       }
     </aside>
+
+    <!-- Mobile Sidebar Backdrop -->
+    @if (mobileMenuOpen()) {
+      <div class="sidebar-backdrop" (click)="closeMobileMenu()"></div>
+    }
 
     <!-- ====== MAIN AREA ====== -->
     <div class="main-area">
@@ -96,13 +102,43 @@
             <svg lucideBell [size]="20"></svg>
             <span class="notification-dot"></span>
           </button>
+          <!-- App Menu -->
+          <div class="app-menu-wrapper">
+            <button class="topbar-icon-btn" [class.active]="appMenuOpen()" (click)="appMenuOpen.set(!appMenuOpen()); $event.stopPropagation()">
+              <svg lucideGrid3x3 [size]="20"></svg>
+            </button>
+            @if (appMenuOpen()) {
+              <div class="app-menu-backdrop" (click)="appMenuOpen.set(false)"></div>
+              <div class="app-menu-popup">
+                <div class="app-menu-header">Ứng dụng</div>
+                <div class="app-menu-grid">
+                  @for (app of appItems; track app.route) {
+                    <a class="app-menu-item" [routerLink]="app.route" (click)="appMenuOpen.set(false)">
+                      <div class="app-menu-icon" [style.background]="app.color">
+                        @switch (app.icon) {
+                          @case ('layout-dashboard') { <svg lucideLayoutDashboard [size]="22" color="#fff"></svg> }
+                          @case ('truck') { <svg lucideTruck [size]="22" color="#fff"></svg> }
+                          @case ('users') { <svg lucideUsers [size]="22" color="#fff"></svg> }
+                          @case ('layout-grid') { <svg lucideLayoutGrid [size]="22" color="#fff"></svg> }
+                          @case ('package') { <svg lucidePackage [size]="22" color="#fff"></svg> }
+                          @case ('warehouse') { <svg lucideWarehouse [size]="22" color="#fff"></svg> }
+                          @case ('shopping-cart') { <svg lucideShoppingCart [size]="22" color="#fff"></svg> }
+                        }
+                      </div>
+                      <span class="app-menu-label">{{ app.label }}</span>
+                    </a>
+                  }
+                </div>
+              </div>
+            }
+          </div>
           <div class="topbar-divider"></div>
           <div class="topbar-user" (click)="userMenu2.toggle($event)">
             <p-avatar icon="pi pi-user" shape="circle" size="normal" styleClass="topbar-avatar" />
             <span class="topbar-username">Admin</span>
             <svg lucideChevronDown [size]="14"></svg>
           </div>
-          <p-menu #userMenu2 [model]="userMenuItems" [popup]="true" />
+          <p-menu #userMenu2 [model]="userMenuItems" [popup]="true" appendTo="body" />
         </div>
       </header>
 

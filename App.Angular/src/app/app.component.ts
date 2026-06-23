@@ -30,6 +30,7 @@ import {
   LucideChevronUp,
   LucideChevronDown,
   LucideShoppingBag,
+  LucideGrid3x3,
 } from '@lucide/angular';
 
 interface NavItem {
@@ -58,9 +59,8 @@ interface NavGroup {
     LucidePanelLeft, LucideAlignJustify,
     LucideMoon, LucideSun, LucideBell,
     LucideChevronUp, LucideChevronDown,
-    LucideShoppingBag,
+    LucideShoppingBag, LucideGrid3x3,
   ],
-  providers: [MessageService, ConfirmationService],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -69,6 +69,18 @@ export class App {
   protected readonly isDarkMode = signal(false);
   protected readonly showLayout = signal(true);
   protected readonly sidebarCollapsed = signal(false);
+  protected readonly mobileMenuOpen = signal(false);
+  protected readonly appMenuOpen = signal(false);
+
+  protected readonly appItems = [
+    { label: 'Dashboard', icon: 'layout-dashboard', route: '/', color: '#10b981' },
+    { label: 'Nhà cung cấp', icon: 'truck', route: '/providers', color: '#3b82f6' },
+    { label: 'Khách hàng', icon: 'users', route: '/customers', color: '#8b5cf6' },
+    { label: 'Danh mục', icon: 'layout-grid', route: '/categories', color: '#f59e0b' },
+    { label: 'Sản phẩm', icon: 'package', route: '/products', color: '#ef4444' },
+    { label: 'Kho hàng', icon: 'warehouse', route: '/warehouses', color: '#06b6d4' },
+    { label: 'Đơn hàng', icon: 'shopping-cart', route: '/orders', color: '#ec4899' },
+  ];
 
   protected readonly navGroups: NavGroup[] = [
     {
@@ -96,8 +108,8 @@ export class App {
   ];
 
   protected readonly userMenuItems: MenuItem[] = [
-    { label: 'Hồ sơ cá nhân', icon: 'pi pi-user' },
-    { label: 'Cài đặt', icon: 'pi pi-cog' },
+    { label: 'Hồ sơ cá nhân', icon: 'pi pi-user', command: () => this.messageService.add({ severity: 'info', summary: 'Thông báo', detail: 'Tính năng đang phát triển.', life: 2000 }) },
+    { label: 'Cài đặt', icon: 'pi pi-cog', command: () => this.messageService.add({ severity: 'info', summary: 'Thông báo', detail: 'Tính năng đang phát triển.', life: 2000 }) },
     { separator: true },
     { label: 'Đăng xuất', icon: 'pi pi-sign-out', command: () => this.logout() }
   ];
@@ -125,7 +137,21 @@ export class App {
   }
 
   toggleSidebar(): void {
-    this.sidebarCollapsed.update(v => !v);
+    if (window.innerWidth <= 768) {
+      this.mobileMenuOpen.update(v => !v);
+    } else {
+      this.sidebarCollapsed.update(v => !v);
+    }
+  }
+
+  closeMobileMenu(): void {
+    this.mobileMenuOpen.set(false);
+  }
+
+  onNavClick(): void {
+    if (window.innerWidth <= 768) {
+      this.mobileMenuOpen.set(false);
+    }
   }
 
   logout(): void {

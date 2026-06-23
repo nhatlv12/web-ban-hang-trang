@@ -11,6 +11,11 @@ export class AuthService {
   readonly user = this.currentUser.asReadonly();
   readonly loggedIn = this.isAuthenticated.asReadonly();
 
+  constructor() {
+    // Auto login for development
+    this.login('admin', '123456');
+  }
+
   login(username: string, password: string): boolean {
     // TODO: Gọi API đăng nhập thật
     if (username && password) {

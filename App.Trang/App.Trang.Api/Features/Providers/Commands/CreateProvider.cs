@@ -23,7 +23,7 @@ public class CreateProviderValidator : AbstractValidator<CreateProviderCommand>
 {
     public CreateProviderValidator()
     {
-        RuleFor(x => x.Code).NotEmpty().MaximumLength(20);
+        RuleFor(x => x.Code).MaximumLength(20);
         RuleFor(x => x.Name).NotEmpty().MaximumLength(200);
         RuleFor(x => x.Phone).MaximumLength(15);
         RuleFor(x => x.Email).MaximumLength(100).EmailAddress().When(x => !string.IsNullOrEmpty(x.Email));
@@ -39,13 +39,16 @@ public class CreateProviderHandler(AppDbContext db) : IRequestHandler<CreateProv
 {
     public async Task<Result<Guid>> Handle(CreateProviderCommand request, CancellationToken ct)
     {
-        // Kiểm tra Code đã tồn tại
-        if (db.Providers.Any(p => p.Code == request.Code))
-            return Result<Guid>.Fail($"Mã nhà cung cấp '{request.Code}' đã tồn tại.");
+        var code = string.IsNullOrWhiteSpace(request.Code)
+            ? Common.Helpers.CodeGenerator.Generate(c => db.Providers.Any(p => p.Code == c), "SUP_")
+            : request.Code;
+
+        if (db.Providers.Any(p => p.Code == code))
+            return Result<Guid>.Fail($"Mã nhà cung cấp '{code}' đã tồn tại.");
 
         var entity = new Provider
         {
-            Code = request.Code,
+            Code = code,
             Name = request.Name,
             Phone = request.Phone,
             Email = request.Email,

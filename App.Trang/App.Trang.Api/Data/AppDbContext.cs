@@ -55,11 +55,6 @@ public class AppDbContext : DbContext
                   .WithMany(e => e.Products)
                   .HasForeignKey(e => e.CategoryId)
                   .OnDelete(DeleteBehavior.Restrict);
-
-            entity.HasOne(e => e.Provider)
-                  .WithMany(e => e.Products)
-                  .HasForeignKey(e => e.ProviderId)
-                  .OnDelete(DeleteBehavior.Restrict);
         });
 
         // ===== WareHouse (1-1 with Product) =====
@@ -71,6 +66,12 @@ public class AppDbContext : DbContext
                   .WithOne(e => e.WareHouse)
                   .HasForeignKey<WareHouse>(e => e.ProductId)
                   .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Provider)
+                  .WithMany(e => e.WareHouses)
+                  .HasForeignKey(e => e.ProviderId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .IsRequired(false);
         });
 
         // ===== Order =====

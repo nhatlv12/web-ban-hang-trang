@@ -33,7 +33,7 @@ public class CreateOrderValidator : AbstractValidator<CreateOrderCommand>
 {
     public CreateOrderValidator()
     {
-        RuleFor(x => x.Code).NotEmpty().MaximumLength(20);
+        RuleFor(x => x.Code).MaximumLength(20);
         RuleFor(x => x.Type).IsInEnum();
         RuleFor(x => x.OrderDate).NotEmpty();
         RuleFor(x => x.Details).NotEmpty().WithMessage("Đơn hàng phải có ít nhất một chi tiết.");
@@ -62,9 +62,14 @@ public class CreateOrderHandler(AppDbContext db) : IRequestHandler<CreateOrderCo
 {
     public async Task<Result<Guid>> Handle(CreateOrderCommand request, CancellationToken ct)
     {
+        // Tự sinh mã nếu không truyền
+        var code = string.IsNullOrWhiteSpace(request.Code)
+            ? Common.Helpers.CodeGenerator.Generate(c => db.Orders.Any(o => o.Code == c), "ORD_")
+            : request.Code;
+
         // Kiểm tra mã đơn hàng
-        if (await db.Orders.AnyAsync(o => o.Code == request.Code, ct))
-            return Result<Guid>.Fail($"Mã đơn hàng '{request.Code}' đã tồn tại.");
+        if (await db.Orders.AnyAsync(o => o.Code == code, ct))
+            return Result<Guid>.Fail($"Mã đơn hàng '{code}' đã tồn tại.");
 
         // Kiểm tra tồn kho khi xuất hàng
         if (request.Type == OrderType.Export)
@@ -89,7 +94,7 @@ public class CreateOrderHandler(AppDbContext db) : IRequestHandler<CreateOrderCo
         // Tạo đơn hàng
         var order = new Order
         {
-            Code = request.Code,
+            Code = code,
             Type = request.Type,
             Status = OrderStatus.Pending,
             OrderDate = request.OrderDate,

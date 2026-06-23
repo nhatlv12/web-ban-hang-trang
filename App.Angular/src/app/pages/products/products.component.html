@@ -45,18 +45,64 @@
 
   <p-dialog [(visible)]="dialogVisible" [header]="isEdit() ? '✏️ Cập nhật sản phẩm' : '➕ Thêm sản phẩm mới'" [modal]="true" [style]="{ width: '740px' }" [draggable]="false">
     <div class="form-grid">
-      <div class="form-field"><p-floatlabel variant="on"><input pInputText id="prod_code" [(ngModel)]="form.code" /><label for="prod_code">Mã SP *</label></p-floatlabel></div>
+      <div class="form-field">
+        <div class="auto-code-row">
+          <label class="toggle-switch toggle-sm"><input type="checkbox" [(ngModel)]="autoCode" /><span class="toggle-slider"></span></label>
+          <span class="auto-code-label">Tự sinh mã</span>
+        </div>
+        <p-floatlabel variant="on">
+          <input pInputText id="prod_code" [(ngModel)]="form.code" [disabled]="autoCode" />
+          <label for="prod_code">Mã SP</label>
+        </p-floatlabel>
+      </div>
       <div class="form-field"><p-floatlabel variant="on"><input pInputText id="prod_name" [(ngModel)]="form.name" /><label for="prod_name">Tên sản phẩm *</label></p-floatlabel></div>
-      <div class="form-field"><p-floatlabel variant="on"><p-select id="prod_cat" [(ngModel)]="form.categoryId" [options]="categoryOptions" optionLabel="label" optionValue="value" /><label for="prod_cat">Danh mục *</label></p-floatlabel></div>
-      <div class="form-field"><p-floatlabel variant="on"><p-select id="prod_prov" [(ngModel)]="form.providerId" [options]="providerOptions" optionLabel="label" optionValue="value" /><label for="prod_prov">Nhà cung cấp *</label></p-floatlabel></div>
+      <div class="form-field">
+        <label class="ss-label">Danh mục *</label>
+        <app-searchable-select [(ngModel)]="form.categoryId" [options]="categoryOptions" placeholder="Chọn danh mục..." />
+      </div>
       <div class="form-field"><p-floatlabel variant="on"><p-inputNumber id="prod_cost" [(ngModel)]="form.costPrice" [min]="0" mode="currency" currency="VND" locale="vi-VN" /><label for="prod_cost">Giá nhập</label></p-floatlabel></div>
       <div class="form-field"><p-floatlabel variant="on"><p-inputNumber id="prod_sell" [(ngModel)]="form.sellingPrice" [min]="0" mode="currency" currency="VND" locale="vi-VN" /><label for="prod_sell">Giá bán *</label></p-floatlabel></div>
       <div class="form-field"><p-floatlabel variant="on"><p-inputNumber id="prod_orig" [(ngModel)]="form.originalPrice" [min]="0" mode="currency" currency="VND" locale="vi-VN" /><label for="prod_orig">Giá gốc (trước KM)</label></p-floatlabel></div>
       <div class="form-field"><p-floatlabel variant="on"><input pInputText id="prod_unit" [(ngModel)]="form.unit" /><label for="prod_unit">Đơn vị tính</label></p-floatlabel></div>
-      <div class="form-field form-field-full"><p-floatlabel variant="on"><input pInputText id="prod_img" [(ngModel)]="form.image" /><label for="prod_img">Hình ảnh (URL)</label></p-floatlabel></div>
+      <div class="form-field form-field-full">
+        <label class="ss-label">Hình ảnh sản phẩm</label>
+        <div class="upload-zone"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)"
+          [class.upload-zone-active]="isDragging"
+          [class.upload-zone-has-image]="imagePreview()"
+          (click)="fileInput.click()">
+          @if (imagePreview()) {
+            <img [src]="imagePreview()" class="upload-preview" alt="Preview" />
+            <div class="upload-overlay">
+              <i class="pi pi-camera"></i>
+              <span>Đổi ảnh</span>
+            </div>
+          } @else {
+            <div class="upload-placeholder">
+              <i class="pi pi-cloud-upload"></i>
+              <span class="upload-text">Kéo thả hoặc nhấn để chọn ảnh</span>
+              <span class="upload-hint">PNG, JPG, WEBP — tối đa 5MB</span>
+            </div>
+          }
+          <input #fileInput type="file" accept="image/*" style="display:none" (change)="onFileSelected($event)" />
+        </div>
+        @if (imagePreview()) {
+          <button type="button" class="upload-remove" (click)="removeImage($event)">
+            <i class="pi pi-times"></i> Xóa ảnh
+          </button>
+        }
+      </div>
       <div class="form-field form-field-full"><p-floatlabel variant="on"><textarea pTextarea id="prod_desc" [(ngModel)]="form.description" rows="3" [autoResize]="true"></textarea><label for="prod_desc">Mô tả sản phẩm</label></p-floatlabel></div>
-      <div class="form-field" style="display:flex;flex-direction:row;align-items:center;gap:0.75rem"><p-toggleSwitch [(ngModel)]="form.isNew" /><span style="font-size:0.85rem;font-weight:600">Sản phẩm mới</span></div>
-      <div class="form-field" style="display:flex;flex-direction:row;align-items:center;gap:0.75rem"><p-toggleSwitch [(ngModel)]="form.isSale" /><span style="font-size:0.85rem;font-weight:600">Đang khuyến mãi</span></div>
+      <div class="form-field" style="display:flex;flex-direction:row;align-items:center;gap:0.75rem">
+        <label class="toggle-switch"><input type="checkbox" [(ngModel)]="form.isNew" /><span class="toggle-slider"></span></label>
+        <span style="font-size:0.85rem;font-weight:600">Sản phẩm mới</span>
+      </div>
+      <div class="form-field" style="display:flex;flex-direction:row;align-items:center;gap:0.75rem">
+        <label class="toggle-switch"><input type="checkbox" [(ngModel)]="form.isSale" /><span class="toggle-slider"></span></label>
+        <span style="font-size:0.85rem;font-weight:600">Đang khuyến mãi</span>
+      </div>
     </div>
     <ng-template #footer>
       <p-button label="Hủy" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="dialogVisible.set(false)" />

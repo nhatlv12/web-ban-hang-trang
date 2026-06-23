@@ -22,6 +22,7 @@
       <ng-template #header><tr>
         <th pSortableColumn="productCode" style="width:100px">Mã SP <p-sortIcon field="productCode" /></th>
         <th pSortableColumn="productName">Tên sản phẩm <p-sortIcon field="productName" /></th>
+        <th pSortableColumn="providerName">Nhà cung cấp <p-sortIcon field="providerName" /></th>
         <th pSortableColumn="quantity" style="text-align:center;width:110px">Tồn kho <p-sortIcon field="quantity" /></th>
         <th style="text-align:center;width:90px">Tối thiểu</th>
         <th style="text-align:center;width:90px">Tối đa</th>
@@ -33,6 +34,7 @@
       <ng-template #body let-item><tr>
         <td><span class="code-badge">{{ item.productCode }}</span></td>
         <td><strong>{{ item.productName }}</strong></td>
+        <td><span class="p-text-secondary">{{ item.providerName || '—' }}</span></td>
         <td style="text-align:center;font-weight:800;font-size:1.1em">{{ item.quantity }}</td>
         <td style="text-align:center;color:var(--p-text-muted-color)">{{ item.minQuantity }}</td>
         <td style="text-align:center;color:var(--p-text-muted-color)">{{ item.maxQuantity }}</td>
@@ -49,6 +51,10 @@
     <div class="form-grid">
       <div class="form-field form-field-full"><p-floatlabel variant="on"><input pInputText id="wh_prod" [value]="form.productCode + ' — ' + form.productName" [disabled]="true" /><label for="wh_prod">Sản phẩm</label></p-floatlabel></div>
       <div class="form-field"><p-floatlabel variant="on"><p-inputNumber id="wh_qty" [(ngModel)]="form.quantity" [min]="0" /><label for="wh_qty">Số lượng tồn kho</label></p-floatlabel></div>
+      <div class="form-field">
+        <label class="ss-label">Nhà cung cấp</label>
+        <app-searchable-select [(ngModel)]="form.providerId" [options]="providerOptions" placeholder="Chọn nhà cung cấp..." [showClear]="true" />
+      </div>
       <div class="form-field"><p-floatlabel variant="on"><input pInputText id="wh_loc" [(ngModel)]="form.location" /><label for="wh_loc">Vị trí kho</label></p-floatlabel></div>
       <div class="form-field"><p-floatlabel variant="on"><p-inputNumber id="wh_min" [(ngModel)]="form.minQuantity" [min]="0" /><label for="wh_min">Tồn tối thiểu</label></p-floatlabel></div>
       <div class="form-field"><p-floatlabel variant="on"><p-inputNumber id="wh_max" [(ngModel)]="form.maxQuantity" [min]="0" /><label for="wh_max">Tồn tối đa</label></p-floatlabel></div>

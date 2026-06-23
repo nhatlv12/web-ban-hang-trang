@@ -1,4 +1,4 @@
-import { Component, signal, computed, OnInit } from '@angular/core';
+import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -12,10 +12,15 @@ import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { HttpClient } from '@angular/common/http';
+import { Api } from '../../api/api';
+import { apiProductsGet, apiProductsIdDelete } from '../../api/functions';
+import { SearchableSelectComponent } from '../../shared/components/searchable-select/searchable-select.component';
+import { environment } from '../../../environments/environment';
 
 interface ProductItem {
   id: string; code: string; name: string; description?: string;
-  categoryId: string; categoryName: string; providerId: string; providerName: string;
+  categoryId: string; categoryName: string;
   costPrice: number; sellingPrice: number; originalPrice?: number;
   unit: string; image?: string; isNew: boolean; isSale: boolean; isActive: boolean;
   stockQuantity: number; createdAt: string;
@@ -23,7 +28,7 @@ interface ProductItem {
 
 @Component({
   selector: 'app-products',
-  imports: [FormsModule, TableModule, ButtonModule, DialogModule, InputTextModule, InputNumberModule, SelectModule, TagModule, ToggleSwitchModule, TextareaModule, TooltipModule, FloatLabelModule],
+  imports: [FormsModule, TableModule, ButtonModule, DialogModule, InputTextModule, InputNumberModule, SelectModule, TagModule, ToggleSwitchModule, TextareaModule, TooltipModule, FloatLabelModule, SearchableSelectComponent],
   templateUrl: './products.component.html',
   styleUrls: ['../../shared/styles/crud-page.scss']
 })
@@ -36,53 +41,179 @@ export class Products implements OnInit {
   form: any = {};
 
   categoryOptions = [{ label: 'Điện thoại', value: '1' }, { label: 'Laptop', value: '2' }, { label: 'Tablet', value: '3' }, { label: 'Phụ kiện', value: '4' }];
-  providerOptions = [{ label: 'Apple Việt Nam', value: '1' }, { label: 'Samsung Electronics', value: '2' }, { label: 'Dell Technologies', value: '3' }, { label: 'Sony Vietnam', value: '4' }];
+
+  private api = inject(Api);
 
   filteredItems = computed(() => {
-    let list = this.items();
+    let list = this.items() || [];
     const s = this.searchValue().toLowerCase();
-    if (s) list = list.filter(i => i.code.toLowerCase().includes(s) || i.name.toLowerCase().includes(s) || i.categoryName.toLowerCase().includes(s));
+    if (s) list = list.filter(i => (i.code || '').toLowerCase().includes(s) || (i.name || '').toLowerCase().includes(s) || (i.categoryName || '').toLowerCase().includes(s));
     if (this.filterCategory()) list = list.filter(i => i.categoryId === this.filterCategory());
     return list;
   });
-  totalCount = computed(() => this.items().length);
-  totalValue = computed(() => this.items().reduce((sum, i) => sum + i.sellingPrice * i.stockQuantity, 0));
-  lowStockCount = computed(() => this.items().filter(i => i.stockQuantity <= 5).length);
+  totalCount = computed(() => (this.items() || []).length);
+  totalValue = computed(() => (this.items() || []).reduce((sum, i) => sum + (i.sellingPrice || 0) * (i.stockQuantity || 0), 0));
+  lowStockCount = computed(() => (this.items() || []).filter(i => (i.stockQuantity || 0) <= 5).length);
 
   constructor(private confirmationService: ConfirmationService, private messageService: MessageService) {}
 
   ngOnInit() {
-    this.items.set([
-      { id: '1', code: 'SP001', name: 'iPhone 16 Pro Max 256GB', categoryId: '1', categoryName: 'Điện thoại', providerId: '1', providerName: 'Apple Việt Nam', costPrice: 30000000, sellingPrice: 34990000, originalPrice: 38990000, unit: 'Cái', isNew: true, isSale: true, isActive: true, stockQuantity: 50, createdAt: '2026-05-01' },
-      { id: '2', code: 'SP002', name: 'MacBook Pro M4 14"', categoryId: '2', categoryName: 'Laptop', providerId: '1', providerName: 'Apple Việt Nam', costPrice: 43000000, sellingPrice: 49990000, unit: 'Cái', isNew: true, isSale: false, isActive: true, stockQuantity: 20, createdAt: '2026-05-10' },
-      { id: '3', code: 'SP003', name: 'AirPods Pro 3', categoryId: '4', categoryName: 'Phụ kiện', providerId: '1', providerName: 'Apple Việt Nam', costPrice: 5500000, sellingPrice: 6990000, originalPrice: 7990000, unit: 'Cái', isNew: false, isSale: true, isActive: true, stockQuantity: 100, createdAt: '2026-04-15' },
-      { id: '4', code: 'SP004', name: 'Galaxy S25 Ultra', categoryId: '1', categoryName: 'Điện thoại', providerId: '2', providerName: 'Samsung Electronics', costPrice: 26000000, sellingPrice: 31990000, unit: 'Cái', isNew: true, isSale: false, isActive: true, stockQuantity: 35, createdAt: '2026-05-20' },
-      { id: '5', code: 'SP005', name: 'iPad Pro M4 11"', categoryId: '3', categoryName: 'Tablet', providerId: '1', providerName: 'Apple Việt Nam', costPrice: 23000000, sellingPrice: 27990000, unit: 'Cái', isNew: false, isSale: false, isActive: true, stockQuantity: 3, createdAt: '2026-03-01' },
-    ]);
+    this.loadData();
+  }
+
+  async loadData() {
+    try {
+      const res: any = await this.api.invoke(apiProductsGet);
+      this.items.set(res?.data || []);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   formatPrice(val: number): string { return new Intl.NumberFormat('vi-VN').format(val) + 'đ'; }
   setCategoryFilter(val: string | null) { this.filterCategory.set(this.filterCategory() === val ? null : val); }
-  openNew() { this.form = { isActive: true, isNew: false, isSale: false, costPrice: 0, sellingPrice: 0, unit: 'Cái', code: '', name: '', description: '' }; this.isEdit.set(false); this.dialogVisible.set(true); }
-  editItem(item: ProductItem) { this.form = { ...item }; this.isEdit.set(true); this.dialogVisible.set(true); }
+
+  imagePreview = signal<string | null>(null);
+  isDragging = false;
+  autoCode = true;
+  private selectedFile: File | null = null;
+  private http = inject(HttpClient);
+
+  openNew() {
+    this.form = { isActive: true, isNew: false, isSale: false, costPrice: 0, sellingPrice: 0, unit: 'Cái', code: '', name: '', description: '' };
+    this.autoCode = true;
+    this.imagePreview.set(null);
+    this.selectedFile = null;
+    this.isEdit.set(false);
+    this.dialogVisible.set(true);
+  }
+
+  editItem(item: ProductItem) {
+    this.form = { ...item };
+    this.imagePreview.set(item.image ? this.getFullImageUrl(item.image) : null);
+    this.selectedFile = null;
+    this.isEdit.set(true);
+    this.dialogVisible.set(true);
+  }
+
+  getFullImageUrl(path: string): string {
+    if (path.startsWith('http')) return path;
+    const base = environment.apiUrl.replace('/api', '');
+    return base + path;
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      this.processFile(files[0]);
+    }
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.processFile(input.files[0]);
+      input.value = '';
+    }
+  }
+
+  private processFile(file: File) {
+    if (!file.type.startsWith('image/')) {
+      this.messageService.add({ severity: 'warn', summary: 'Sai định dạng', detail: 'Vui lòng chọn file ảnh (PNG, JPG, WEBP).', life: 3000 });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      this.messageService.add({ severity: 'warn', summary: 'File quá lớn', detail: 'Kích thước ảnh không được vượt quá 5MB.', life: 3000 });
+      return;
+    }
+    this.selectedFile = file;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview.set(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeImage(event: Event) {
+    event.stopPropagation();
+    this.imagePreview.set(null);
+    this.selectedFile = null;
+    this.form.image = null;
+  }
 
   deleteItem(item: ProductItem) {
     this.confirmationService.confirm({
       message: `Bạn có chắc muốn xóa <b>${item.name}</b>?`, header: 'Xác nhận xóa', icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Xóa', rejectLabel: 'Hủy', acceptButtonStyleClass: 'p-button-danger',
-      accept: () => { this.items.update(l => l.filter(i => i.id !== item.id)); this.messageService.add({ severity: 'success', summary: 'Đã xóa', detail: `${item.name} đã được xóa.`, life: 3000 }); }
+      accept: async () => { 
+        try {
+          await this.api.invoke(apiProductsIdDelete, { id: item.id });
+          this.items.update(l => l.filter(i => i.id !== item.id)); 
+          this.messageService.add({ severity: 'success', summary: 'Đã xóa', detail: `${item.name} đã được xóa.`, life: 3000 }); 
+        } catch(err) {
+          console.error(err);
+        }
+      }
     });
   }
 
-  saveItem() {
-    if (!this.form.code || !this.form.name) { this.messageService.add({ severity: 'warn', summary: 'Thiếu thông tin', detail: 'Vui lòng nhập mã và tên sản phẩm.', life: 3000 }); return; }
+  private buildFormData(): FormData {
+    const fd = new FormData();
+    fd.append('Code', this.autoCode ? '' : (this.form.code || ''));
+    fd.append('Name', this.form.name || '');
+    fd.append('Description', this.form.description || '');
+    fd.append('CategoryId', this.form.categoryId || '');
+    fd.append('CostPrice', String(this.form.costPrice || 0));
+    fd.append('SellingPrice', String(this.form.sellingPrice || 0));
+    if (this.form.originalPrice != null) fd.append('OriginalPrice', String(this.form.originalPrice));
+    fd.append('Unit', this.form.unit || '');
+    fd.append('IsNew', String(this.form.isNew || false));
+    fd.append('IsSale', String(this.form.isSale || false));
     if (this.isEdit()) {
-      this.items.update(l => l.map(i => i.id === this.form.id ? { ...i, ...this.form } : i));
-      this.messageService.add({ severity: 'success', summary: 'Đã cập nhật', detail: 'Sản phẩm đã được cập nhật.', life: 3000 });
-    } else {
-      this.items.update(l => [{ ...this.form, id: crypto.randomUUID(), createdAt: new Date().toISOString().slice(0, 10), isActive: true, stockQuantity: 0 }, ...l]);
-      this.messageService.add({ severity: 'success', summary: 'Đã tạo', detail: 'Sản phẩm mới đã được tạo.', life: 3000 });
+      fd.append('Id', this.form.id || '');
+      fd.append('IsActive', String(this.form.isActive ?? true));
     }
-    this.dialogVisible.set(false);
+    if (this.selectedFile) {
+      fd.append('Image', this.selectedFile, this.selectedFile.name);
+    }
+    return fd;
+  }
+
+  async saveItem() {
+    if (!this.form.code || !this.form.name) {
+      this.messageService.add({ severity: 'warn', summary: 'Thiếu thông tin', detail: 'Vui lòng nhập mã và tên sản phẩm.', life: 3000 });
+      return;
+    }
+    try {
+      const fd = this.buildFormData();
+      const baseUrl = environment.apiUrl.replace('/api', '');
+      if (this.isEdit()) {
+        await this.http.put(`${baseUrl}/api/products/${this.form.id}`, fd).toPromise();
+        this.messageService.add({ severity: 'success', summary: 'Đã cập nhật', detail: 'Sản phẩm đã được cập nhật.', life: 3000 });
+      } else {
+        await this.http.post(`${baseUrl}/api/products`, fd).toPromise();
+        this.messageService.add({ severity: 'success', summary: 'Đã tạo', detail: 'Sản phẩm mới đã được tạo.', life: 3000 });
+      }
+      this.dialogVisible.set(false);
+      this.loadData();
+    } catch (err: any) {
+      const msg = err?.error?.message || 'Có lỗi xảy ra.';
+      this.messageService.add({ severity: 'error', summary: 'Lỗi', detail: msg, life: 4000 });
+    }
   }
 }

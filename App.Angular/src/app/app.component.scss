@@ -377,23 +377,185 @@
 /* ============================== */
 /* RESPONSIVE                      */
 /* ============================== */
+
+/* --- Tablet (768px - 1024px) --- */
+@media (max-width: 1024px) {
+  .content-area {
+    padding: 1.25rem;
+  }
+}
+
+/* --- Mobile (≤ 768px) --- */
 @media (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%);
+    width: 270px;
+    box-shadow: none;
 
-    &:not(.collapsed) {
+    &.mobile-open {
       transform: translateX(0);
-      box-shadow: 4px 0 25px rgba(0, 0, 0, 0.15);
+      box-shadow: 4px 0 30px rgba(0, 0, 0, 0.2);
     }
+  }
+
+  .sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 999;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   .main-area {
     margin-left: 0 !important;
   }
 
+  .topbar {
+    padding: 0 0.75rem;
+  }
+
   .topbar-username,
   .topbar-divider {
     display: none;
+  }
+
+  .topbar-user {
+    padding: 0.35rem 0.5rem;
+  }
+
+  .content-area {
+    padding: 0.85rem;
+  }
+}
+
+/* ============================== */
+/* APP MENU (Grid Launcher)        */
+/* ============================== */
+.app-menu-wrapper {
+  position: relative;
+}
+
+.topbar-icon-btn.active {
+  background: #ecfdf5;
+  border-color: #10b981;
+
+  svg {
+    stroke: #10b981;
+  }
+}
+
+.app-menu-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 8000;
+}
+
+.app-menu-popup {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 320px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  z-index: 9000;
+  animation: appMenuSlideIn 0.2s ease;
+  overflow: hidden;
+}
+
+@keyframes appMenuSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.app-menu-header {
+  padding: 0.85rem 1.15rem 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.app-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 0.65rem;
+}
+
+.app-menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.75rem 0.4rem;
+  border-radius: 12px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #f0faf4;
+    text-decoration: none;
+
+    .app-menu-icon {
+      transform: scale(1.1);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+  }
+}
+
+.app-menu-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.app-menu-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+}
+
+/* Mobile: app menu full-width */
+@media (max-width: 480px) {
+  .app-menu-popup {
+    position: fixed;
+    top: 64px;
+    left: 8px;
+    right: 8px;
+    width: auto;
+    border-radius: 14px;
   }
 }
 
@@ -417,4 +579,17 @@
 
 .user-chevron {
   stroke: #94a3b8;
+}
+
+/* ============================== */
+/* P-MENU POPUP Z-INDEX FIX       */
+/* ============================== */
+:host ::ng-deep .p-menu-overlay,
+:host ::ng-deep .p-menu {
+  z-index: 9999 !important;
+}
+
+.topbar-right {
+  position: relative;
+  z-index: 600;
 }

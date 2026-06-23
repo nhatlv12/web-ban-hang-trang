@@ -7,13 +7,20 @@ import Aura from '@primeuix/themes/aura';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { errorInterceptor } from './core/interceptors/error.interceptor';
+import { provideApiConfiguration } from './api/api-configuration';
+import { environment } from '../environments/environment';
+import { MessageService, ConfirmationService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    MessageService,
+    ConfirmationService,
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideAnimationsAsync(),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
+    provideApiConfiguration(environment.apiUrl.replace(/\/api$/, '')),
     providePrimeNG({
       theme: {
         preset: Aura,

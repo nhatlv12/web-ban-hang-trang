@@ -10,6 +10,9 @@ public class WareHouse : BaseEntity
     /// <summary>Mã sản phẩm (FK, unique - quan hệ 1-1 với Product)</summary>
     public Guid ProductId { get; set; }
 
+    /// <summary>Mã nhà cung cấp</summary>
+    public Guid? ProviderId { get; set; }
+
     /// <summary>Số lượng tồn kho hiện tại</summary>
     public int Quantity { get; set; } = 0;
 
@@ -29,4 +32,7 @@ public class WareHouse : BaseEntity
     // Navigation properties
     /// <summary>Sản phẩm tương ứng</summary>
     public Product Product { get; set; } = null!;
+
+    /// <summary>Nhà cung cấp</summary>
+    public Provider? Provider { get; set; }
 }

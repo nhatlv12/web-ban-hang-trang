@@ -272,9 +272,6 @@ namespace App.Trang.Api.Ef
                     b.Property<decimal?>("OriginalPrice")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid>("ProviderId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<decimal>("SellingPrice")
                         .HasColumnType("decimal(18,2)");
 
@@ -292,8 +289,6 @@ namespace App.Trang.Api.Ef
 
                     b.HasIndex("Code")
                         .IsUnique();
-
-                    b.HasIndex("ProviderId");
 
                     b.ToTable("Products");
                 });
@@ -380,6 +375,9 @@ namespace App.Trang.Api.Ef
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ProviderId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
@@ -390,6 +388,8 @@ namespace App.Trang.Api.Ef
 
                     b.HasIndex("ProductId")
                         .IsUnique();
+
+                    b.HasIndex("ProviderId");
 
                     b.ToTable("WareHouses");
                 });
@@ -448,15 +448,7 @@ namespace App.Trang.Api.Ef
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("App.Trang.Api.Entities.Provider", "Provider")
-                        .WithMany("Products")
-                        .HasForeignKey("ProviderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Category");
-
-                    b.Navigation("Provider");
                 });
 
             modelBuilder.Entity("App.Trang.Api.Entities.WareHouse", b =>
@@ -467,7 +459,14 @@ namespace App.Trang.Api.Ef
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("App.Trang.Api.Entities.Provider", "Provider")
+                        .WithMany("WareHouses")
+                        .HasForeignKey("ProviderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Product");
+
+                    b.Navigation("Provider");
                 });
 
             modelBuilder.Entity("App.Trang.Api.Entities.Category", b =>
@@ -498,7 +497,7 @@ namespace App.Trang.Api.Ef
                 {
                     b.Navigation("Orders");
 
-                    b.Navigation("Products");
+                    b.Navigation("WareHouses");
                 });
 #pragma warning restore 612, 618
         }

@@ -7,6 +7,7 @@ namespace App.Trang.Api.Features.WareHouses.Commands;
 
 public record UpdateStockCommand(
     Guid Id,
+    Guid? ProviderId,
     int Quantity,
     int MinQuantity,
     int MaxQuantity,
@@ -33,6 +34,7 @@ public class UpdateStockHandler(AppDbContext db) : IRequestHandler<UpdateStockCo
         if (entity is null)
             return Result.Fail("Không tìm thấy bản ghi kho.");
 
+        entity.ProviderId = request.ProviderId;
         entity.Quantity = request.Quantity;
         entity.MinQuantity = request.MinQuantity;
         entity.MaxQuantity = request.MaxQuantity;

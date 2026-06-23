@@ -6,6 +6,7 @@ using App.Trang.Api.Features.Orders;
 using App.Trang.Api.Features.Products;
 using App.Trang.Api.Features.Providers;
 using App.Trang.Api.Features.WareHouses;
+using App.Trang.Api.Endpoints;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -56,9 +57,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseCors("AllowAngular");
 
-// ===== Global Exception Handler cho Validation =====
+// ===== Global Exception Handler =====
 app.Use(async (context, next) =>
 {
     try
@@ -70,13 +72,17 @@ app.Use(async (context, next) =>
         context.Response.StatusCode = 400;
         context.Response.ContentType = "application/json";
 
-        var errors = ex.Errors.Select(e => e.ErrorMessage).ToList();
-        var result = new
-        {
-            Success = false,
-            Message = "Validation failed",
-            Errors = errors
-        };
+        var errorMessage = string.Join("\n", ex.Errors.Select(e => e.ErrorMessage));
+        var result = new App.Trang.Api.Common.Models.ApiResponse(false, errorMessage);
+
+        await context.Response.WriteAsJsonAsync(result);
+    }
+    catch (Exception ex)
+    {
+        context.Response.StatusCode = 400;
+        context.Response.ContentType = "application/json";
+
+        var result = new App.Trang.Api.Common.Models.ApiResponse(false, ex.Message);
 
         await context.Response.WriteAsJsonAsync(result);
     }

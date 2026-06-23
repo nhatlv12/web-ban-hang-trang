@@ -43,8 +43,8 @@ public class Provider : BaseEntity
     public bool IsActive { get; set; } = true;
 
     // Navigation properties
-    /// <summary>Danh sách sản phẩm do nhà cung cấp này cung cấp</summary>
-    public ICollection<Product> Products { get; set; } = new List<Product>();
+    /// <summary>Danh sách tồn kho thuộc nhà cung cấp này</summary>
+    public ICollection<WareHouse> WareHouses { get; set; } = new List<WareHouse>();
 
     /// <summary>Danh sách đơn hàng nhập từ nhà cung cấp này</summary>
     public ICollection<Order> Orders { get; set; } = new List<Order>();

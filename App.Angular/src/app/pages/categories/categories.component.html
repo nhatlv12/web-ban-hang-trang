@@ -62,17 +62,23 @@
   <p-dialog [(visible)]="dialogVisible" [header]="isEdit() ? '✏️ Cập nhật danh mục' : '➕ Thêm danh mục mới'"
     [modal]="true" [style]="{ width: '600px' }" [draggable]="false">
     <div class="form-grid">
-      <div class="form-field"><p-floatlabel variant="on"><input pInputText id="cat_code"
-            [(ngModel)]="form.code" /><label for="cat_code">Mã danh mục *</label></p-floatlabel></div>
+      <div class="form-field">
+        <div class="auto-code-row">
+          <label class="toggle-switch toggle-sm"><input type="checkbox" [(ngModel)]="autoCode" /><span class="toggle-slider"></span></label>
+          <span class="auto-code-label">Tự sinh mã</span>
+        </div>
+        <p-floatlabel variant="on"><input pInputText id="cat_code" [(ngModel)]="form.code" [disabled]="autoCode" /><label for="cat_code">Mã danh mục</label></p-floatlabel>
+      </div>
       <div class="form-field"><p-floatlabel variant="on"><input pInputText id="cat_name"
             [(ngModel)]="form.name" /><label for="cat_name">Tên danh mục *</label></p-floatlabel></div>
       <div class="form-field"><p-floatlabel variant="on"><input pInputText id="cat_icon"
             [(ngModel)]="form.icon" /><label for="cat_icon">Icon (VD: pi pi-mobile)</label></p-floatlabel></div>
       <div class="form-field"><p-floatlabel variant="on"><p-inputNumber id="cat_sort" [(ngModel)]="form.sortOrder"
             [min]="0" /><label for="cat_sort">Thứ tự hiển thị</label></p-floatlabel></div>
-      <div class="form-field form-field-full"><p-floatlabel variant="on"><p-select id="cat_parent"
-            [(ngModel)]="form.parentId" [options]="parentOptions" optionLabel="label" optionValue="value" /><label
-            for="cat_parent">Danh mục cha</label></p-floatlabel></div>
+      <div class="form-field form-field-full">
+        <label class="ss-label">Danh mục cha</label>
+        <app-searchable-select [(ngModel)]="form.parentId" [options]="parentOptions" placeholder="Chọn danh mục cha..." [showClear]="true" />
+      </div>
       <div class="form-field form-field-full"><p-floatlabel variant="on"><input pInputText id="cat_desc"
             [(ngModel)]="form.description" /><label for="cat_desc">Mô tả</label></p-floatlabel></div>
     </div>

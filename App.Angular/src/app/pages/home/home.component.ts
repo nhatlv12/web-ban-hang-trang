@@ -8,6 +8,7 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
+import { SearchableSelectComponent } from '../../shared/components/searchable-select/searchable-select.component';
 
 // Lucide Icons
 import {
@@ -21,7 +22,7 @@ import {
   selector: 'app-home',
   imports: [
     ButtonModule, CardModule, ChartModule, SelectModule, TableModule, TagModule,
-    FormsModule, RouterLink,
+    FormsModule, RouterLink, SearchableSelectComponent,
     LucideShoppingCart, LucidePackage, LucideUsers, LucideWallet,
     LucideClipboardList, LucideBarChart3,
     LucideTrendingUp, LucideArrowUpRight,
