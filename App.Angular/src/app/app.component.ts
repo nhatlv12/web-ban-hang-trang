@@ -31,6 +31,7 @@ import {
   LucideChevronDown,
   LucideShoppingBag,
   LucideGrid3x3,
+  LucideDownload,
 } from '@lucide/angular';
 
 interface NavItem {
@@ -59,7 +60,7 @@ interface NavGroup {
     LucidePanelLeft, LucideAlignJustify,
     LucideMoon, LucideSun, LucideBell,
     LucideChevronUp, LucideChevronDown,
-    LucideShoppingBag, LucideGrid3x3,
+    LucideShoppingBag, LucideGrid3x3, LucideDownload,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
@@ -79,7 +80,8 @@ export class App {
     { label: 'Danh mục', icon: 'layout-grid', route: '/categories', color: '#f59e0b' },
     { label: 'Sản phẩm', icon: 'package', route: '/products', color: '#ef4444' },
     { label: 'Kho hàng', icon: 'warehouse', route: '/warehouses', color: '#06b6d4' },
-    { label: 'Đơn hàng', icon: 'shopping-cart', route: '/orders', color: '#ec4899' },
+    { label: 'Nhập hàng', icon: 'download', route: '/import-orders', color: '#0ea5e9' },
+    { label: 'Đơn hàng bán', icon: 'shopping-cart', route: '/orders', color: '#ec4899' },
   ];
 
   protected readonly navGroups: NavGroup[] = [
@@ -102,7 +104,8 @@ export class App {
       title: 'KHO & BÁN HÀNG',
       items: [
         { label: 'Kho hàng', iconSelector: 'warehouse', route: '/warehouses' },
-        { label: 'Đơn hàng', iconSelector: 'shopping-cart', route: '/orders', badge: 3 },
+        { label: 'Nhập hàng', iconSelector: 'download', route: '/import-orders' },
+        { label: 'Đơn hàng bán', iconSelector: 'shopping-cart', route: '/orders', badge: 3 },
       ]
     }
   ];

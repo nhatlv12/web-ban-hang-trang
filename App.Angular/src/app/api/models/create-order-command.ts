@@ -12,5 +12,6 @@ export interface CreateOrderCommand {
   note?: string | null;
   orderDate?: string;
   providerId?: string | null;
+  shippingFee?: number;
   type?: OrderType;
 }

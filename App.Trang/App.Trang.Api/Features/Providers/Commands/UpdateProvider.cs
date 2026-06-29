@@ -26,7 +26,7 @@ public class UpdateProviderValidator : AbstractValidator<UpdateProviderCommand>
     public UpdateProviderValidator()
     {
         RuleFor(x => x.Id).NotEmpty();
-        RuleFor(x => x.Code).NotEmpty().MaximumLength(20);
+        RuleFor(x => x.Code).MaximumLength(20);
         RuleFor(x => x.Name).NotEmpty().MaximumLength(200);
         RuleFor(x => x.Phone).MaximumLength(15);
         RuleFor(x => x.Email).MaximumLength(100).EmailAddress().When(x => !string.IsNullOrEmpty(x.Email));
@@ -50,7 +50,8 @@ public class UpdateProviderHandler(AppDbContext db) : IRequestHandler<UpdateProv
         if (await db.Providers.AnyAsync(p => p.Code == request.Code && p.Id != request.Id, ct))
             return Result.Fail($"Mã nhà cung cấp '{request.Code}' đã tồn tại.");
 
-        entity.Code = request.Code;
+        if (!string.IsNullOrEmpty(request.Code))
+            entity.Code = request.Code;
         entity.Name = request.Name;
         entity.Phone = request.Phone;
         entity.Email = request.Email;

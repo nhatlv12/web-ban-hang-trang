@@ -1,4 +1,5 @@
 import { Component, signal, computed, OnInit, inject } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -9,6 +10,7 @@ import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { FloatLabelModule } from 'primeng/floatlabel';
+import { TabsModule } from 'primeng/tabs';
 import { MessageService } from 'primeng/api';
 import { Api } from '../../api/api';
 import { apiWarehousesGet, apiWarehousesIdPut } from '../../api/functions';
@@ -18,12 +20,14 @@ interface WareHouseItem {
   id: string; productId: string; productCode: string; productName: string;
   providerId?: string; providerName?: string;
   quantity: number; minQuantity: number; maxQuantity: number; location?: string;
+  totalImport: number; totalExport: number;
+  costPrice: number; importDate?: string;
   lastStockUpdate: string;
 }
 
 @Component({
   selector: 'app-warehouses',
-  imports: [FormsModule, TableModule, ButtonModule, DialogModule, InputTextModule, InputNumberModule, SelectModule, TagModule, TooltipModule, FloatLabelModule, SearchableSelectComponent],
+  imports: [CommonModule, DatePipe, FormsModule, TableModule, ButtonModule, DialogModule, InputTextModule, InputNumberModule, SelectModule, TagModule, TooltipModule, FloatLabelModule, TabsModule, SearchableSelectComponent],
   templateUrl: './warehouses.component.html',
   styleUrls: ['../../shared/styles/crud-page.scss']
 })
@@ -32,6 +36,7 @@ export class WareHouses implements OnInit {
   dialogVisible = signal(false);
   searchValue = signal('');
   filterStock = signal<string | null>(null);
+  activeTab = signal(0);
   form: any = {};
 
   providerOptions = [{ label: 'Apple Việt Nam', value: '1' }, { label: 'Samsung Electronics', value: '2' }, { label: 'Dell Technologies', value: '3' }, { label: 'Sony Vietnam', value: '4' }];
@@ -40,8 +45,14 @@ export class WareHouses implements OnInit {
 
   filteredItems = computed(() => {
     let list = this.items() || [];
+    // Tab filter
+    const tab = this.activeTab();
+    if (tab === 1) list = list.filter(i => (i.quantity || 0) > 0 && i.importDate); // Kho nhập: có tồn kho + đã nhập
+    else if (tab === 2) list = list.filter(i => (i.quantity || 0) <= 0 || !i.importDate); // Kho xuất: hết hàng hoặc chưa nhập
+    // Search
     const s = this.searchValue().toLowerCase();
-    if (s) list = list.filter(i => (i.productCode || '').toLowerCase().includes(s) || (i.productName || '').toLowerCase().includes(s) || (i.location || '').toLowerCase().includes(s));
+    if (s) list = list.filter(i => (i.productCode || '').toLowerCase().includes(s) || (i.productName || '').toLowerCase().includes(s) || (i.location || '').toLowerCase().includes(s) || (i.providerName || '').toLowerCase().includes(s));
+    // Stock filter
     const f = this.filterStock();
     if (f === 'out') list = list.filter(i => (i.quantity || 0) <= 0);
     else if (f === 'low') list = list.filter(i => (i.quantity || 0) > 0 && (i.quantity || 0) <= (i.minQuantity || 0));
@@ -52,6 +63,8 @@ export class WareHouses implements OnInit {
   totalStock = computed(() => (this.items() || []).reduce((sum, i) => sum + (i.quantity || 0), 0));
   lowStockCount = computed(() => (this.items() || []).filter(i => (i.quantity || 0) > 0 && (i.quantity || 0) <= (i.minQuantity || 0)).length);
   outOfStockCount = computed(() => (this.items() || []).filter(i => (i.quantity || 0) <= 0).length);
+  importedCount = computed(() => (this.items() || []).filter(i => (i.quantity || 0) > 0 && i.importDate).length);
+  exportedCount = computed(() => (this.items() || []).filter(i => (i.quantity || 0) <= 0 || !i.importDate).length);
 
   constructor(private messageService: MessageService) {}
 
@@ -68,6 +81,7 @@ export class WareHouses implements OnInit {
     }
   }
 
+  formatPrice(val: number): string { return new Intl.NumberFormat('vi-VN').format(val) + 'đ'; }
   getStockSeverity(item: WareHouseItem): 'success' | 'warn' | 'danger' { return (item.quantity || 0) <= 0 ? 'danger' : (item.quantity || 0) <= (item.minQuantity || 0) ? 'warn' : 'success'; }
   getStockLabel(item: WareHouseItem): string { return (item.quantity || 0) <= 0 ? 'Hết hàng' : (item.quantity || 0) <= (item.minQuantity || 0) ? 'Sắp hết' : 'Đủ hàng'; }
   setFilter(v: string | null) { this.filterStock.set(this.filterStock() === v ? null : v); }

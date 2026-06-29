@@ -12,7 +12,9 @@ public record CreateOrderDetailDto(
     Guid ProductId,
     int Quantity,
     decimal UnitPrice,
-    decimal Discount
+    decimal Discount,
+    decimal Tax,
+    Guid? ProviderId
 );
 
 // === Command ===
@@ -23,6 +25,7 @@ public record CreateOrderCommand(
     Guid? ProviderId,
     Guid? CustomerId,
     decimal Discount,
+    decimal ShippingFee,
     string? Note,
     string? CreatedBy,
     List<CreateOrderDetailDto> Details
@@ -45,10 +48,7 @@ public class CreateOrderValidator : AbstractValidator<CreateOrderCommand>
             detail.RuleFor(d => d.Discount).GreaterThanOrEqualTo(0);
         });
 
-        // Phiếu nhập phải có nhà cung cấp
-        RuleFor(x => x.ProviderId)
-            .NotEmpty().When(x => x.Type == OrderType.Import)
-            .WithMessage("Phiếu nhập phải chọn nhà cung cấp.");
+        // Bỏ validate ProviderId ở header theo yêu cầu của user
 
         // Phiếu xuất phải có khách hàng
         RuleFor(x => x.CustomerId)
@@ -96,11 +96,12 @@ public class CreateOrderHandler(AppDbContext db) : IRequestHandler<CreateOrderCo
         {
             Code = code,
             Type = request.Type,
-            Status = OrderStatus.Pending,
+            Status = request.Type == OrderType.Import ? OrderStatus.Completed : OrderStatus.Pending,
             OrderDate = request.OrderDate,
             ProviderId = request.ProviderId,
             CustomerId = request.CustomerId,
             Discount = request.Discount,
+            ShippingFee = request.ShippingFee,
             Note = request.Note,
             CreatedBy = request.CreatedBy
         };
@@ -108,7 +109,7 @@ public class CreateOrderHandler(AppDbContext db) : IRequestHandler<CreateOrderCo
         decimal totalAmount = 0;
         foreach (var detail in request.Details)
         {
-            var lineTotal = detail.Quantity * detail.UnitPrice - detail.Discount;
+            var lineTotal = detail.Quantity * detail.UnitPrice - detail.Discount + detail.Tax;
             totalAmount += lineTotal;
 
             order.OrderDetails.Add(new OrderDetail
@@ -117,30 +118,49 @@ public class CreateOrderHandler(AppDbContext db) : IRequestHandler<CreateOrderCo
                 Quantity = detail.Quantity,
                 UnitPrice = detail.UnitPrice,
                 Discount = detail.Discount,
-                TotalPrice = lineTotal
+                Tax = detail.Tax,
+                TotalPrice = lineTotal,
+                ProviderId = detail.ProviderId
             });
         }
 
         order.TotalAmount = totalAmount;
-        order.FinalAmount = totalAmount - request.Discount;
+        order.FinalAmount = totalAmount - request.Discount + request.ShippingFee;
 
         db.Orders.Add(order);
 
         // Cập nhật tồn kho
         foreach (var detail in request.Details)
         {
+            var providerIdToUse = detail.ProviderId ?? request.ProviderId;
             var wareHouse = await db.WareHouses
-                .FirstOrDefaultAsync(w => w.ProductId == detail.ProductId, ct);
+                .FirstOrDefaultAsync(w => w.ProductId == detail.ProductId && w.ProviderId == providerIdToUse, ct);
 
-            if (wareHouse != null)
+            if (wareHouse == null)
             {
-                if (request.Type == OrderType.Import)
-                    wareHouse.Quantity += detail.Quantity;
-                else
-                    wareHouse.Quantity -= detail.Quantity;
-
-                wareHouse.LastStockUpdate = DateTime.UtcNow;
+                wareHouse = new WareHouse
+                {
+                    ProductId = detail.ProductId,
+                    ProviderId = providerIdToUse,
+                    Quantity = 0
+                };
+                db.WareHouses.Add(wareHouse);
             }
+
+            if (request.Type == OrderType.Import)
+            {
+                wareHouse.Quantity += detail.Quantity;
+                wareHouse.TotalImport += detail.Quantity;
+                wareHouse.CostPrice = detail.UnitPrice;
+                wareHouse.ImportDate = request.OrderDate;
+            }
+            else
+            {
+                wareHouse.Quantity -= detail.Quantity;
+                wareHouse.TotalExport += detail.Quantity;
+            }
+
+            wareHouse.LastStockUpdate = DateTime.UtcNow;
         }
 
         await db.SaveChangesAsync(ct);

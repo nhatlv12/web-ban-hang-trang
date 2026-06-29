@@ -27,7 +27,7 @@ public class UpdateCustomerValidator : AbstractValidator<UpdateCustomerCommand>
     public UpdateCustomerValidator()
     {
         RuleFor(x => x.Id).NotEmpty();
-        RuleFor(x => x.Code).NotEmpty().MaximumLength(20);
+        RuleFor(x => x.Code).MaximumLength(20);
         RuleFor(x => x.FullName).NotEmpty().MaximumLength(200);
         RuleFor(x => x.Phone).NotEmpty().MaximumLength(15);
         RuleFor(x => x.Email).MaximumLength(100).EmailAddress().When(x => !string.IsNullOrEmpty(x.Email));
@@ -48,7 +48,8 @@ public class UpdateCustomerHandler(AppDbContext db) : IRequestHandler<UpdateCust
         if (await db.Customers.AnyAsync(c => c.Code == request.Code && c.Id != request.Id, ct))
             return Result.Fail($"Mã khách hàng '{request.Code}' đã tồn tại.");
 
-        entity.Code = request.Code;
+        if (!string.IsNullOrEmpty(request.Code))
+            entity.Code = request.Code;
         entity.FullName = request.FullName;
         entity.Phone = request.Phone;
         entity.Email = request.Email;

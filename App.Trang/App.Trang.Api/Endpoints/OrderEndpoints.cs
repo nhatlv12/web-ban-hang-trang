@@ -3,6 +3,7 @@ using App.Trang.Api.Entities;
 using App.Trang.Api.Features.Orders.Commands;
 using App.Trang.Api.Features.Orders.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace App.Trang.Api.Endpoints;
 
@@ -40,21 +41,21 @@ public static class OrderEndpoints
         return result.Success ? Results.Ok(apiResponse) : Results.BadRequest(apiResponse);
     }
 
-    private static async Task<IResult> GetOrderById(Guid id, IMediator mediator)
+    private static async Task<IResult> GetOrderById([FromRoute] Guid id, IMediator mediator)
     {
         var result = await mediator.Send(new GetOrderByIdQuery(id));
         var apiResponse = new ApiResponse<object>(result.Success, result.Message, result.Data);
         return result.Success ? Results.Ok(apiResponse) : Results.BadRequest(apiResponse);
     }
 
-    private static async Task<IResult> CreateOrder(CreateOrderCommand cmd, IMediator mediator)
+    private static async Task<IResult> CreateOrder([FromBody] CreateOrderCommand cmd, IMediator mediator)
     {
         var result = await mediator.Send(cmd);
         var apiResponse = new ApiResponse<Guid>(result.Success, result.Message, result.Data);
         return result.Success ? Results.Ok(apiResponse) : Results.BadRequest(apiResponse);
     }
 
-    private static async Task<IResult> UpdateOrderStatus(Guid id, UpdateOrderStatusCommand cmd, IMediator mediator)
+    private static async Task<IResult> UpdateOrderStatus([FromRoute] Guid id, [FromBody] UpdateOrderStatusCommand cmd, IMediator mediator)
     {
         if (id != cmd.Id)
             return Results.BadRequest(new ApiResponse(false, "Id không khớp."));
@@ -64,7 +65,7 @@ public static class OrderEndpoints
         return result.Success ? Results.Ok(apiResponse) : Results.BadRequest(apiResponse);
     }
 
-    private static async Task<IResult> CancelOrder(Guid id, ISender sender)
+    private static async Task<IResult> CancelOrder([FromRoute] Guid id, ISender sender)
     {
         var result = await sender.Send(new CancelOrderCommand(id));
         var apiResponse = new ApiResponse(result.Success, result.Message);

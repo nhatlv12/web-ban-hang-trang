@@ -28,7 +28,7 @@ export interface SelectOption {
       </div>
 
       @if (isOpen()) {
-        <div class="ss-dropdown">
+        <div class="ss-dropdown" [ngStyle]="dropdownStyle()">
           @if (searchable) {
             <div class="ss-search-box">
               <i class="pi pi-search"></i>
@@ -91,10 +91,10 @@ export interface SelectOption {
       align-items: center;
       justify-content: space-between;
       width: 100%;
-      min-height: 44px;
-      padding: 0.7rem 0.85rem;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 10px;
+      min-height: 42px;
+      padding: 0.45rem 0.85rem;
+      border: 1.5px solid #d1fae5;
+      border-radius: 12px;
       background: #fff;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -148,15 +148,12 @@ export interface SelectOption {
 
     /* ===== Dropdown Panel ===== */
     .ss-dropdown {
-      position: absolute;
-      top: calc(100% + 6px);
-      left: 0;
-      right: 0;
+      position: fixed;
       background: #fff;
       border: 1.5px solid #d1fae5;
       border-radius: 12px;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(16, 185, 129, 0.08);
-      z-index: 1050;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(16, 185, 129, 0.08);
+      z-index: 99999;
       overflow: hidden;
       animation: ssSlideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -330,6 +327,7 @@ export class SearchableSelectComponent implements ControlValueAccessor {
   isOpen = signal(false);
   searchTerm = signal('');
   selectedValue = signal<any>(null);
+  dropdownStyle = signal<{ [key: string]: string }>({});
 
   private onChange: (val: any) => void = () => {};
   private onTouched: () => void = () => {};
@@ -360,14 +358,40 @@ export class SearchableSelectComponent implements ControlValueAccessor {
     if (this.isOpen()) {
       this.close();
     } else {
+      this.updateDropdownPosition();
       this.isOpen.set(true);
       this.searchTerm.set('');
-      // Auto-focus search input
       setTimeout(() => {
         const input = this.elRef.nativeElement.querySelector('.ss-search-input');
         input?.focus();
       }, 50);
     }
+  }
+
+  private updateDropdownPosition() {
+    const trigger = this.elRef.nativeElement.querySelector('.ss-trigger');
+    if (!trigger) return;
+    const rect = trigger.getBoundingClientRect();
+
+    // Find nearest parent with CSS transform (breaks position:fixed)
+    let offsetX = 0, offsetY = 0;
+    let parent: HTMLElement | null = trigger.parentElement;
+    while (parent) {
+      const style = window.getComputedStyle(parent);
+      if (style.transform && style.transform !== 'none') {
+        const pRect = parent.getBoundingClientRect();
+        offsetX = pRect.left;
+        offsetY = pRect.top;
+        break;
+      }
+      parent = parent.parentElement;
+    }
+
+    this.dropdownStyle.set({
+      top: (rect.bottom + 6 - offsetY) + 'px',
+      left: (rect.left - offsetX) + 'px',
+      width: rect.width + 'px'
+    });
   }
 
   close() {

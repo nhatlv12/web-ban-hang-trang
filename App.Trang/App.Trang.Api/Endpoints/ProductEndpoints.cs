@@ -2,6 +2,7 @@ using App.Trang.Api.Common.Models;
 using App.Trang.Api.Features.Products.Commands;
 using App.Trang.Api.Features.Products.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace App.Trang.Api.Endpoints;
 
@@ -41,31 +42,29 @@ public static class ProductEndpoints
         return result.Success ? Results.Ok(apiResponse) : Results.BadRequest(apiResponse);
     }
 
-    private static async Task<IResult> GetProductById(Guid id, IMediator mediator)
+    private static async Task<IResult> GetProductById([FromRoute] Guid id, IMediator mediator)
     {
         var result = await mediator.Send(new GetProductByIdQuery(id));
         var apiResponse = new ApiResponse<object>(result.Success, result.Message, result.Data);
         return result.Success ? Results.Ok(apiResponse) : Results.BadRequest(apiResponse);
     }
 
-    private static async Task<IResult> CreateProduct([AsParameters] CreateProductCommand cmd, IMediator mediator)
+    private static async Task<IResult> CreateProduct([FromForm] CreateProductCommand cmd, IMediator mediator)
     {
         var result = await mediator.Send(cmd);
         var apiResponse = new ApiResponse<Guid>(result.Success, result.Message, result.Data);
         return result.Success ? Results.Ok(apiResponse) : Results.BadRequest(apiResponse);
     }
 
-    private static async Task<IResult> UpdateProduct(Guid id, [AsParameters] UpdateProductCommand cmd, IMediator mediator)
+    private static async Task<IResult> UpdateProduct([FromRoute] Guid id, [FromForm] UpdateProductCommand cmd, IMediator mediator)
     {
-        if (id != cmd.Id)
-            return Results.BadRequest(new ApiResponse(false, "Id không khớp."));
-
+        cmd.Id = id;
         var result = await mediator.Send(cmd);
         var apiResponse = new ApiResponse(result.Success, result.Message);
         return result.Success ? Results.Ok(apiResponse) : Results.BadRequest(apiResponse);
     }
 
-    private static async Task<IResult> DeleteProduct(Guid id, ISender sender)
+    private static async Task<IResult> DeleteProduct([FromRoute] Guid id, ISender sender)
     {
         var result = await sender.Send(new DeleteProductCommand(id));
         var apiResponse = new ApiResponse(result.Success, result.Message);

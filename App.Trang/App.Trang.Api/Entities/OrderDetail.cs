@@ -24,9 +24,16 @@ public class OrderDetail : BaseEntity
     [Column(TypeName = "decimal(18,2)")]
     public decimal Discount { get; set; } = 0;
 
-    /// <summary>Thành tiền (Quantity × UnitPrice - Discount)</summary>
+    /// <summary>Thuế (VND)</summary>
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal Tax { get; set; } = 0;
+
+    /// <summary>Thành tiền (Quantity × UnitPrice - Discount + Tax)</summary>
     [Column(TypeName = "decimal(18,2)")]
     public decimal TotalPrice { get; set; }
+
+    /// <summary>Mã nhà cung cấp (FK) - dùng cho phiếu nhập</summary>
+    public Guid? ProviderId { get; set; }
 
     // Navigation properties
     /// <summary>Đơn hàng</summary>
@@ -34,4 +41,7 @@ public class OrderDetail : BaseEntity
 
     /// <summary>Sản phẩm</summary>
     public Product Product { get; set; } = null!;
+
+    /// <summary>Nhà cung cấp</summary>
+    public Provider? Provider { get; set; }
 }

@@ -5,14 +5,13 @@
   </div>
   <div class="stats-row">
     <div class="stat-card"><div class="stat-icon bg-indigo"><i class="pi pi-box"></i></div><div class="stat-content"><span class="stat-value">{{ totalCount() }}</span><span class="stat-label">Tổng sản phẩm</span></div></div>
-    <div class="stat-card"><div class="stat-icon bg-emerald"><i class="pi pi-dollar"></i></div><div class="stat-content"><span class="stat-value">{{ formatPrice(totalValue()) }}</span><span class="stat-label">Giá trị tồn kho</span></div></div>
     <div class="stat-card"><div class="stat-icon bg-amber"><i class="pi pi-exclamation-triangle"></i></div><div class="stat-content"><span class="stat-value">{{ lowStockCount() }}</span><span class="stat-label">Sắp hết hàng</span></div></div>
   </div>
   <div class="table-card">
     <div class="table-toolbar">
       <div class="toolbar-left">
         <div class="search-box"><i class="pi pi-search"></i><input pInputText placeholder="Tìm theo mã, tên, danh mục..." [ngModel]="searchValue()" (ngModelChange)="searchValue.set($event)" /></div>
-        @for (cat of categoryOptions; track cat.value) {
+        @for (cat of categoryOptions(); track cat.value) {
           <span class="filter-chip" [class.active]="filterCategory() === cat.value" (click)="setCategoryFilter(cat.value)">{{ cat.label }}</span>
         }
       </div>
@@ -23,9 +22,8 @@
         <th pSortableColumn="code" style="width:100px">Mã <p-sortIcon field="code" /></th>
         <th pSortableColumn="name">Tên sản phẩm <p-sortIcon field="name" /></th>
         <th style="width:110px">Danh mục</th>
-        <th pSortableColumn="sellingPrice" style="text-align:right;width:150px">Giá bán <p-sortIcon field="sellingPrice" /></th>
+        <th style="text-align:right;width:130px">Giá bán</th>
         <th style="text-align:center;width:80px">Tồn kho</th>
-        <th style="width:100px">Tags</th>
         <th style="width:100px">Trạng thái</th>
         <th style="width:120px">Thao tác</th>
       </tr></ng-template>
@@ -33,13 +31,12 @@
         <td><span class="code-badge">{{ item.code }}</span></td>
         <td><div><strong>{{ item.name }}</strong></div><div style="font-size:0.78rem;color:var(--p-text-muted-color)">{{ item.providerName }}</div></td>
         <td><p-tag [value]="item.categoryName" severity="secondary" /></td>
-        <td style="text-align:right"><span class="price">{{ formatPrice(item.sellingPrice) }}</span>@if (item.originalPrice) {<span class="price-original">{{ formatPrice(item.originalPrice) }}</span>}</td>
+        <td style="text-align:right;font-weight:600;color:var(--p-primary-color)">{{ formatPrice(item.sellingPrice || 0) }}</td>
         <td style="text-align:center"><p-tag [value]="'' + item.stockQuantity" [severity]="item.stockQuantity <= 5 ? 'danger' : item.stockQuantity <= 20 ? 'warn' : 'success'" /></td>
-        <td><div style="display:flex;gap:4px;flex-wrap:wrap">@if (item.isNew) {<p-tag value="Mới" severity="info" />}@if (item.isSale) {<p-tag value="Sale" severity="warn" />}</div></td>
         <td><p-tag [value]="item.isActive ? 'Hoạt động' : 'Ngừng'" [severity]="item.isActive ? 'success' : 'danger'" /></td>
         <td><div class="action-buttons"><p-button icon="pi pi-pencil" [rounded]="true" [outlined]="true" severity="success" pTooltip="Sửa" (onClick)="editItem(item)" /><p-button icon="pi pi-trash" [rounded]="true" [outlined]="true" severity="danger" pTooltip="Xóa" (onClick)="deleteItem(item)" /></div></td>
       </tr></ng-template>
-      <ng-template #emptymessage><tr><td colspan="8"><div class="empty-message"><i class="pi pi-inbox"></i><p>Không tìm thấy sản phẩm nào</p></div></td></tr></ng-template>
+      <ng-template #emptymessage><tr><td colspan="7"><div class="empty-message"><i class="pi pi-inbox"></i><p>Không tìm thấy sản phẩm nào</p></div></td></tr></ng-template>
     </p-table>
   </div>
 
@@ -58,12 +55,10 @@
       <div class="form-field"><p-floatlabel variant="on"><input pInputText id="prod_name" [(ngModel)]="form.name" /><label for="prod_name">Tên sản phẩm *</label></p-floatlabel></div>
       <div class="form-field">
         <label class="ss-label">Danh mục *</label>
-        <app-searchable-select [(ngModel)]="form.categoryId" [options]="categoryOptions" placeholder="Chọn danh mục..." />
+        <app-searchable-select [(ngModel)]="form.categoryId" [options]="categoryOptions()" placeholder="Chọn danh mục..." />
       </div>
-      <div class="form-field"><p-floatlabel variant="on"><p-inputNumber id="prod_cost" [(ngModel)]="form.costPrice" [min]="0" mode="currency" currency="VND" locale="vi-VN" /><label for="prod_cost">Giá nhập</label></p-floatlabel></div>
-      <div class="form-field"><p-floatlabel variant="on"><p-inputNumber id="prod_sell" [(ngModel)]="form.sellingPrice" [min]="0" mode="currency" currency="VND" locale="vi-VN" /><label for="prod_sell">Giá bán *</label></p-floatlabel></div>
-      <div class="form-field"><p-floatlabel variant="on"><p-inputNumber id="prod_orig" [(ngModel)]="form.originalPrice" [min]="0" mode="currency" currency="VND" locale="vi-VN" /><label for="prod_orig">Giá gốc (trước KM)</label></p-floatlabel></div>
       <div class="form-field"><p-floatlabel variant="on"><input pInputText id="prod_unit" [(ngModel)]="form.unit" /><label for="prod_unit">Đơn vị tính</label></p-floatlabel></div>
+      <div class="form-field"><p-floatlabel variant="on"><p-inputNumber id="prod_price" [(ngModel)]="form.sellingPrice" [min]="0" mode="currency" currency="VND" locale="vi-VN" /><label for="prod_price">Giá bán mặc định</label></p-floatlabel></div>
       <div class="form-field form-field-full">
         <label class="ss-label">Hình ảnh sản phẩm</label>
         <div class="upload-zone"
@@ -95,14 +90,7 @@
         }
       </div>
       <div class="form-field form-field-full"><p-floatlabel variant="on"><textarea pTextarea id="prod_desc" [(ngModel)]="form.description" rows="3" [autoResize]="true"></textarea><label for="prod_desc">Mô tả sản phẩm</label></p-floatlabel></div>
-      <div class="form-field" style="display:flex;flex-direction:row;align-items:center;gap:0.75rem">
-        <label class="toggle-switch"><input type="checkbox" [(ngModel)]="form.isNew" /><span class="toggle-slider"></span></label>
-        <span style="font-size:0.85rem;font-weight:600">Sản phẩm mới</span>
-      </div>
-      <div class="form-field" style="display:flex;flex-direction:row;align-items:center;gap:0.75rem">
-        <label class="toggle-switch"><input type="checkbox" [(ngModel)]="form.isSale" /><span class="toggle-slider"></span></label>
-        <span style="font-size:0.85rem;font-weight:600">Đang khuyến mãi</span>
-      </div>
+
     </div>
     <ng-template #footer>
       <p-button label="Hủy" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="dialogVisible.set(false)" />

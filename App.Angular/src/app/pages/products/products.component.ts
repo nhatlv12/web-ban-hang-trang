@@ -14,16 +14,15 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { HttpClient } from '@angular/common/http';
 import { Api } from '../../api/api';
-import { apiProductsGet, apiProductsIdDelete } from '../../api/functions';
+import { apiProductsGet, apiProductsIdDelete, apiCategoriesGet } from '../../api/functions';
 import { SearchableSelectComponent } from '../../shared/components/searchable-select/searchable-select.component';
 import { environment } from '../../../environments/environment';
 
 interface ProductItem {
   id: string; code: string; name: string; description?: string;
   categoryId: string; categoryName: string;
-  costPrice: number; sellingPrice: number; originalPrice?: number;
-  unit: string; image?: string; isNew: boolean; isSale: boolean; isActive: boolean;
-  stockQuantity: number; createdAt: string;
+  unit: string; image?: string; isActive: boolean;
+  sellingPrice: number; stockQuantity: number; createdAt: string;
 }
 
 @Component({
@@ -40,7 +39,7 @@ export class Products implements OnInit {
   filterCategory = signal<string | null>(null);
   form: any = {};
 
-  categoryOptions = [{ label: 'Điện thoại', value: '1' }, { label: 'Laptop', value: '2' }, { label: 'Tablet', value: '3' }, { label: 'Phụ kiện', value: '4' }];
+  categoryOptions = signal<{ label: string; value: string }[]>([]);
 
   private api = inject(Api);
 
@@ -52,13 +51,23 @@ export class Products implements OnInit {
     return list;
   });
   totalCount = computed(() => (this.items() || []).length);
-  totalValue = computed(() => (this.items() || []).reduce((sum, i) => sum + (i.sellingPrice || 0) * (i.stockQuantity || 0), 0));
   lowStockCount = computed(() => (this.items() || []).filter(i => (i.stockQuantity || 0) <= 5).length);
 
   constructor(private confirmationService: ConfirmationService, private messageService: MessageService) {}
 
   ngOnInit() {
+    this.loadCategories();
     this.loadData();
+  }
+
+  async loadCategories() {
+    try {
+      const res: any = await this.api.invoke(apiCategoriesGet);
+      const categories = res?.data || [];
+      this.categoryOptions.set(categories.map((c: any) => ({ label: c.name, value: c.id })));
+    } catch (err) {
+      console.error('Failed to load categories', err);
+    }
   }
 
   async loadData() {
@@ -80,7 +89,7 @@ export class Products implements OnInit {
   private http = inject(HttpClient);
 
   openNew() {
-    this.form = { isActive: true, isNew: false, isSale: false, costPrice: 0, sellingPrice: 0, unit: 'Cái', code: '', name: '', description: '' };
+    this.form = { isActive: true, unit: 'Cái', code: '', name: '', description: '', sellingPrice: 0 };
     this.autoCode = true;
     this.imagePreview.set(null);
     this.selectedFile = null;
@@ -92,6 +101,7 @@ export class Products implements OnInit {
     this.form = { ...item };
     this.imagePreview.set(item.image ? this.getFullImageUrl(item.image) : null);
     this.selectedFile = null;
+    this.autoCode = false;
     this.isEdit.set(true);
     this.dialogVisible.set(true);
   }
@@ -174,16 +184,13 @@ export class Products implements OnInit {
 
   private buildFormData(): FormData {
     const fd = new FormData();
-    fd.append('Code', this.autoCode ? '' : (this.form.code || ''));
+    fd.append('Code', this.isEdit() ? (this.form.code || '') : (this.autoCode ? '' : (this.form.code || '')));
     fd.append('Name', this.form.name || '');
     fd.append('Description', this.form.description || '');
     fd.append('CategoryId', this.form.categoryId || '');
-    fd.append('CostPrice', String(this.form.costPrice || 0));
-    fd.append('SellingPrice', String(this.form.sellingPrice || 0));
-    if (this.form.originalPrice != null) fd.append('OriginalPrice', String(this.form.originalPrice));
     fd.append('Unit', this.form.unit || '');
-    fd.append('IsNew', String(this.form.isNew || false));
-    fd.append('IsSale', String(this.form.isSale || false));
+    fd.append('SellingPrice', String(this.form.sellingPrice || 0));
+    fd.append('CostPrice', String(this.form.costPrice || 0));
     if (this.isEdit()) {
       fd.append('Id', this.form.id || '');
       fd.append('IsActive', String(this.form.isActive ?? true));

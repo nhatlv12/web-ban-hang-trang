@@ -14,14 +14,14 @@ public class GetProductByIdHandler(AppDbContext db) : IRequestHandler<GetProduct
         var product = await db.Products
             .AsNoTracking()
             .Include(p => p.Category)
-            .Include(p => p.WareHouse)
+            .Include(p => p.WareHouses)
             .Where(p => p.Id == request.Id)
             .Select(p => new ProductDto(
                 p.Id, p.Code, p.Name, p.Description,
                 p.CategoryId, p.Category.Name,
                 p.CostPrice, p.SellingPrice, p.OriginalPrice,
                 p.Unit, p.Image, p.IsNew, p.IsSale, p.IsActive,
-                p.WareHouse != null ? p.WareHouse.Quantity : 0,
+                p.WareHouses.Sum(w => w.Quantity),
                 p.CreatedAt, p.UpdatedAt
             ))
             .FirstOrDefaultAsync(ct);

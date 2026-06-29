@@ -1,0 +1,251 @@
+<div class="crud-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title"><i class="pi pi-download bg-sky"></i> Nhập hàng</h1>
+      <p class="page-subtitle">Quản lý phiếu nhập kho từ nhà cung cấp</p>
+    </div>
+    <p-button label="Tạo phiếu nhập" icon="pi pi-plus" (onClick)="openNew()" [raised]="true" />
+  </div>
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon bg-indigo"><i class="pi pi-file"></i></div>
+      <div class="stat-content"><span class="stat-value">{{ totalOrders() }}</span><span class="stat-label">Tổng phiếu
+          nhập</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon bg-emerald"><i class="pi pi-dollar"></i></div>
+      <div class="stat-content"><span class="stat-value">{{ formatPrice(totalCost()) }}</span><span
+          class="stat-label">Tổng chi mua hàng</span></div>
+    </div>
+  </div>
+
+  <div class="table-card" style="margin-top:1rem">
+    <div class="table-toolbar">
+      <div class="toolbar-left" style="gap:0.5rem">
+        <div class="search-box"><i class="pi pi-search"></i><input pInputText placeholder="Tìm theo mã, tên..."
+            [ngModel]="searchValue()" (ngModelChange)="searchValue.set($event)" style="width:200px" /></div>
+        <p-datepicker [(ngModel)]="filterFromDate" [showIcon]="true" placeholder="Từ ngày" dateFormat="dd/mm/yy"
+          panelStyleClass="custom-datepicker-panel" />
+        <p-datepicker [(ngModel)]="filterToDate" [showIcon]="true" placeholder="Đến ngày" dateFormat="dd/mm/yy"
+          panelStyleClass="custom-datepicker-panel" />
+        <app-searchable-select [(ngModel)]="filterProduct" [options]="productOptions" placeholder="Lọc sản phẩm..."
+          [showClear]="true" />
+        <app-searchable-select [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event)"
+          [options]="statusOptions" [searchable]="false" placeholder="Trạng thái" style="width:140px" />
+      </div>
+      <div class="toolbar-right"><p-button icon="pi pi-refresh" [rounded]="true" [text]="true" pTooltip="Làm mới"
+          (onClick)="searchValue.set(''); filterStatus.set(null); filterFromDate.set(null); filterToDate.set(null); filterProduct.set(null)" />
+      </div>
+    </div>
+    <p-table [value]="filteredItems()" [paginator]="true" [rows]="10" [rowHover]="true" dataKey="id"
+      [showCurrentPageReport]="true" currentPageReportTemplate="Hiển thị {first} - {last} / {totalRecords}">
+      <ng-template #header>
+        <tr>
+          <th pSortableColumn="code" style="width:140px">Mã phiếu <p-sortIcon field="code" /></th>
+          <th pSortableColumn="orderDate" style="width:160px">Ngày nhập <p-sortIcon field="orderDate" /></th>
+          <th pSortableColumn="discount" style="text-align:right;width:130px">Giảm giá <p-sortIcon field="discount" />
+          </th>
+          <th pSortableColumn="shippingFee" style="text-align:right;width:130px">Phí ship <p-sortIcon
+              field="shippingFee" /></th>
+          <th pSortableColumn="finalAmount" style="text-align:right;width:160px">Tổng tiền <p-sortIcon
+              field="finalAmount" /></th>
+          <th style="width:130px">Trạng thái</th>
+          <th style="width:80px;text-align:center">Thao tác</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-item>
+        <tr>
+          <td><span class="code-badge">{{ item.code }}</span></td>
+          <td>{{ item.orderDate | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td style="text-align:right">
+            @if (item.discount > 0) {
+            <span style="color:#10b981;font-weight:bold">{{ formatPrice(item.discount) }}</span>
+            }
+          </td>
+          <td style="text-align:right">{{ formatPrice(item.shippingFee || 0) }}</td>
+          <td style="text-align:right"><span class="price">{{ formatPrice(item.finalAmount) }}</span></td>
+          <td><p-tag [value]="getStatusLabel(item.status)" [severity]="getStatusSeverity(item.status)" /></td>
+          <td style="text-align:center">
+            <p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="info" pTooltip="Xem chi tiết"
+              (onClick)="viewItem(item.id)" />
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="6">
+            <div class="empty-message"><i class="pi pi-inbox"></i>
+              <p>Chưa có phiếu nhập nào</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <p-dialog [(visible)]="dialogVisible" header="📦 Tạo phiếu nhập hàng" [modal]="true" [style]="{ width: '66vw' }"
+    [contentStyle]="{ overflow: 'visible' }" [draggable]="false">
+    <div class="form-grid">
+      <div class="form-field"><p-floatlabel variant="on"><input pInputText id="imp_code"
+            [(ngModel)]="form.code" /><label for="imp_code">Mã phiếu (tự sinh nếu để trống)</label></p-floatlabel></div>
+      <div class="form-field"><p-floatlabel variant="on"><p-datepicker id="imp_date" [(ngModel)]="form.orderDate"
+            dateFormat="dd/mm/yy" [showIcon]="true" panelStyleClass="custom-datepicker-panel" /><label
+            for="imp_date">Ngày nhập</label></p-floatlabel></div>
+    </div>
+
+    <h3 style="margin:1.5rem 0 0.8rem;font-size:0.95rem;color:var(--p-text-color)"><i class="pi pi-list"
+        style="margin-right:0.5rem"></i>Chi tiết sản phẩm nhập</h3>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:0.88rem">
+        <thead>
+          <tr style="background:var(--p-surface-100);border-bottom:2px solid var(--p-surface-200)">
+            <th style="text-align:left;padding:0.6rem">Sản phẩm</th>
+            <th style="text-align:left;padding:0.6rem;width:200px">Nhà cung cấp</th>
+            <th style="text-align:center;padding:0.6rem;width:100px">Số lượng</th>
+            <th style="text-align:right;padding:0.6rem;width:150px">Giá nhập</th>
+            <th style="text-align:right;padding:0.6rem;width:130px">Thành tiền</th>
+            <th style="width:50px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (line of details(); track $index) {
+          <tr style="border-bottom:1px solid var(--p-surface-200)">
+            <td style="padding:0.5rem">
+              <app-searchable-select [ngModel]="line.productId" (ngModelChange)="onProductSelect($index, $event)"
+                [options]="productOptions" placeholder="Chọn SP..." />
+            </td>
+            <td style="padding:0.5rem">
+              <app-searchable-select [(ngModel)]="line.providerId" [options]="providerOptions"
+                placeholder="Chọn NCC..." />
+            </td>
+            <td style="padding:0.5rem;text-align:center"><p-inputNumber [(ngModel)]="line.quantity" [min]="1"
+                [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus"
+                decrementButtonIcon="pi pi-minus" [inputStyle]="{'width':'60px','text-align':'center'}" /></td>
+            <td style="padding:0.5rem"><p-inputNumber [(ngModel)]="line.unitPrice" [min]="0" mode="currency"
+                currency="VND" locale="vi-VN" [inputStyle]="{'width':'130px','text-align':'right'}" /></td>
+            <td style="padding:0.5rem;text-align:right;font-weight:600">{{ formatPrice(calcLineTotal(line)) }}</td>
+            <td style="padding:0.5rem;text-align:center"><p-button icon="pi pi-trash" [rounded]="true" [text]="true"
+                severity="danger" (onClick)="removeLine($index)" [disabled]="details().length <= 1" /></td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <p-button label="Thêm sản phẩm" icon="pi pi-plus" [text]="true" severity="info" (onClick)="addLine()"
+      [style]="{'margin-top':'0.5rem'}" />
+
+    <div
+      style="margin-top:1.5rem;padding:1rem;background:var(--p-surface-50);border-radius:12px;display:flex;flex-direction:column;gap:0.6rem">
+      <div style="display:flex;justify-content:space-between"><span>Tổng tiền hàng:</span><strong>{{
+          formatPrice(calcSubtotal()) }}</strong></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span>Giảm giá:</span>
+        <div style="display:flex;gap:0.5rem">
+          @if (form.discountType === 'VND') {
+          <p-inputNumber [(ngModel)]="form.discount" [min]="0" mode="currency" currency="VND" locale="vi-VN"
+            [inputStyle]="{'width':'130px','text-align':'right'}" />
+          } @else {
+          <p-inputNumber [(ngModel)]="form.discount" [min]="0" [max]="100" suffix=" %"
+            [inputStyle]="{'width':'130px','text-align':'right'}" />
+          }
+          <p-select [options]="discountTypeOptions" [(ngModel)]="form.discountType" optionLabel="label"
+            optionValue="value" [style]="{'width': '80px'}" />
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center"><span>Phí vận
+          chuyển:</span><p-inputNumber [(ngModel)]="form.shippingFee" [min]="0" mode="currency" currency="VND"
+          locale="vi-VN" [inputStyle]="{'width':'150px','text-align':'right'}" /></div>
+      <hr style="border:0;border-top:1px solid var(--p-surface-200)">
+      <div style="display:flex;justify-content:space-between;font-size:1.1rem"><strong>TỔNG CỘNG:</strong><strong
+          style="color:var(--p-primary-color)">{{ formatPrice(calcTotal()) }}</strong></div>
+    </div>
+
+    <ng-template #footer>
+      <p-button label="Hủy" icon="pi pi-times" severity="secondary" [outlined]="true"
+        (onClick)="dialogVisible.set(false)" />
+      <p-button label="Tạo phiếu nhập" icon="pi pi-check" [raised]="true" (onClick)="saveItem()" />
+    </ng-template>
+  </p-dialog>
+
+  <p-dialog [(visible)]="viewDialogVisible" header="Chi tiết phiếu nhập" [modal]="true" [style]="{ width: '60vw' }"
+    [draggable]="false">
+    @if (viewedOrder()) {
+    <div
+      style="margin-bottom:1.5rem;display:flex;justify-content:space-between;background:var(--p-surface-50);padding:1rem;border-radius:12px">
+      <div style="display:flex;flex-direction:column;gap:0.5rem">
+        <div><span style="color:var(--p-text-muted-color)">Mã phiếu:</span> <strong
+            style="color:var(--p-primary-color);font-size:1.1rem;margin-left:0.5rem">{{ viewedOrder().code }}</strong>
+        </div>
+        <div><span style="color:var(--p-text-muted-color)">Ngày nhập:</span> <span style="margin-left:0.5rem">{{
+            viewedOrder().orderDate | date:'dd/MM/yyyy HH:mm' }}</span></div>
+      </div>
+      <div style="text-align:right;display:flex;flex-direction:column;gap:0.5rem">
+        <div><p-tag [value]="getStatusLabel(viewedOrder().status)"
+            [severity]="getStatusSeverity(viewedOrder().status)" /></div>
+        <div><span style="color:var(--p-text-muted-color)">Người tạo:</span> <span style="margin-left:0.5rem">{{
+            viewedOrder().createdBy || 'Admin' }}</span></div>
+      </div>
+    </div>
+    <h3 style="margin:0 0 1rem;font-size:1rem;color:var(--p-text-color)"><i class="pi pi-list"
+        style="margin-right:0.5rem"></i>Danh sách sản phẩm</h3>
+    <table
+      style="width:100%;border-collapse:collapse;font-size:0.9rem;border:1px solid var(--p-surface-200);border-radius:8px;overflow:hidden">
+      <thead>
+        <tr style="background:var(--p-surface-100);border-bottom:2px solid var(--p-surface-200)">
+          <th style="text-align:left;padding:0.8rem">Mã SP</th>
+          <th style="text-align:left;padding:0.8rem">Tên sản phẩm</th>
+          <th style="text-align:left;padding:0.8rem">Nhà cung cấp</th>
+          <th style="text-align:center;padding:0.8rem">Số lượng</th>
+          <th style="text-align:right;padding:0.8rem">Giá nhập</th>
+          <th style="text-align:right;padding:0.8rem">Thành tiền</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (line of viewedOrder().details; track $index) {
+        <tr style="border-bottom:1px solid var(--p-surface-200)">
+          <td style="padding:0.8rem"><span class="code-badge">{{ line.productCode || '—' }}</span></td>
+          <td style="padding:0.8rem;font-weight:600">{{ line.productName }}</td>
+          <td style="padding:0.8rem;color:var(--p-text-muted-color)">{{ line.providerName || '—' }}</td>
+          <td style="padding:0.8rem;text-align:center;font-weight:700">{{ line.quantity }}</td>
+          <td style="padding:0.8rem;text-align:right">{{ formatPrice(line.unitPrice) }}</td>
+          <td style="padding:0.8rem;text-align:right;font-weight:600;color:var(--p-primary-color)">{{
+            formatPrice(line.totalPrice) }}</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+    <div
+      style="margin-top:1.5rem;padding:1rem;background:var(--p-surface-50);border-radius:12px;display:flex;flex-direction:column;gap:0.6rem;width:350px;margin-left:auto">
+      <div style="display:flex;justify-content:space-between"><span>Tổng tiền hàng:</span><strong>{{
+          formatPrice(viewedOrder().totalAmount) }}</strong></div>
+      <div style="display:flex;justify-content:space-between"><span>Giảm giá:</span>
+        @if (viewedOrder().discount > 0) {
+        <strong style="color:#10b981;font-size:1.1rem">{{ formatPrice(viewedOrder().discount) }}</strong>
+        } @else {
+        <strong>0đ</strong>
+        }
+      </div>
+      <div style="display:flex;justify-content:space-between"><span>Phí vận chuyển:</span><strong>{{
+          formatPrice(viewedOrder().shippingFee) }}</strong></div>
+      <hr style="border:0;border-top:1px solid var(--p-surface-200)">
+      <div style="display:flex;justify-content:space-between;font-size:1.2rem"><strong>TỔNG CỘNG:</strong><strong
+          style="color:var(--p-primary-color)">{{ formatPrice(viewedOrder().finalAmount) }}</strong></div>
+    </div>
+    }
+    <ng-template #footer>
+      <div style="display:flex;justify-content:space-between;width:100%;align-items:center">
+        <div style="display:flex;gap:0.5rem">
+          @if (viewedOrder()?.status !== 3 && viewedOrder()?.status !== 4) {
+          <p-button label="Hoàn thành" icon="pi pi-check-circle" severity="success" (onClick)="changeStatus(3)" />
+          }
+          @if (viewedOrder()?.status !== 4) {
+          <p-button label="Hủy phiếu" icon="pi pi-times-circle" severity="danger" [outlined]="true"
+            (onClick)="changeStatus(4)" />
+          }
+        </div>
+        <p-button label="Đóng" icon="pi pi-times" severity="secondary" [text]="true"
+          (onClick)="viewDialogVisible.set(false)" />
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>

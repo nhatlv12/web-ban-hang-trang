@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace App.Trang.Api.Entities;
 
@@ -22,9 +23,22 @@ public class WareHouse : BaseEntity
     /// <summary>Số lượng tồn kho tối đa (0 = không giới hạn)</summary>
     public int MaxQuantity { get; set; } = 0;
 
+    /// <summary>Tổng số lượng đã nhập</summary>
+    public int TotalImport { get; set; } = 0;
+
+    /// <summary>Tổng số lượng đã xuất</summary>
+    public int TotalExport { get; set; } = 0;
+
     /// <summary>Vị trí kho / kệ</summary>
     [MaxLength(200)]
     public string? Location { get; set; }
+
+    /// <summary>Giá mua (giá nhập gần nhất)</summary>
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal CostPrice { get; set; } = 0;
+
+    /// <summary>Ngày nhập kho gần nhất</summary>
+    public DateTime? ImportDate { get; set; }
 
     /// <summary>Lần cập nhật tồn kho gần nhất</summary>
     public DateTime LastStockUpdate { get; set; } = DateTime.UtcNow;

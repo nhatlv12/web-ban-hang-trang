@@ -62,7 +62,7 @@ export class Providers implements OnInit {
 
   setFilter(val: boolean | null) { this.filterActive.set(this.filterActive() === val ? null : val); }
   openNew() { this.form = { isActive: true, code: '', name: '', phone: '', email: '', taxCode: '', contactPerson: '', address: '', note: '' }; this.autoCode = true; this.isEdit.set(false); this.dialogVisible.set(true); }
-  editItem(item: ProviderItem) { this.form = { ...item }; this.isEdit.set(true); this.dialogVisible.set(true); }
+  editItem(item: ProviderItem) { this.form = { ...item }; this.autoCode = false; this.isEdit.set(true); this.dialogVisible.set(true); }
 
   deleteItem(item: ProviderItem) {
     this.confirmationService.confirm({
@@ -82,7 +82,7 @@ export class Providers implements OnInit {
 
   async saveItem() {
     if (!this.form.name) { this.messageService.add({ severity: 'warn', summary: 'Thiếu thông tin', detail: 'Vui lòng nhập tên nhà cung cấp.', life: 3000 }); return; }
-    const body = { ...this.form, code: this.autoCode ? '' : (this.form.code || '') };
+    const body = { ...this.form, code: this.isEdit() ? (this.form.code || '') : (this.autoCode ? '' : (this.form.code || '')) };
     try {
       if (this.isEdit()) {
         await this.api.invoke(apiProvidersIdPut, { id: this.form.id, body });

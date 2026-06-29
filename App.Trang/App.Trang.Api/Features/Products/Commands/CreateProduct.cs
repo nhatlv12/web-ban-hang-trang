@@ -3,6 +3,7 @@ using App.Trang.Api.Data;
 using App.Trang.Api.Entities;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace App.Trang.Api.Features.Products.Commands;
 
@@ -78,14 +79,6 @@ public class CreateProductHandler(AppDbContext db, IWebHostEnvironment env) : IR
         };
 
         db.Products.Add(entity);
-
-        // Tự động tạo bản ghi kho hàng
-        var wareHouse = new WareHouse
-        {
-            ProductId = entity.Id,
-            Quantity = 0
-        };
-        db.WareHouses.Add(wareHouse);
 
         await db.SaveChangesAsync(ct);
 

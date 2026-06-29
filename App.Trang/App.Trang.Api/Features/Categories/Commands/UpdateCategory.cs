@@ -16,7 +16,7 @@ public class UpdateCategoryValidator : AbstractValidator<UpdateCategoryCommand>
     public UpdateCategoryValidator()
     {
         RuleFor(x => x.Id).NotEmpty();
-        RuleFor(x => x.Code).NotEmpty().MaximumLength(20);
+        RuleFor(x => x.Code).MaximumLength(20);
         RuleFor(x => x.Name).NotEmpty().MaximumLength(200);
         RuleFor(x => x.Description).MaximumLength(500);
         RuleFor(x => x.Icon).MaximumLength(50);
@@ -37,7 +37,8 @@ public class UpdateCategoryHandler(AppDbContext db) : IRequestHandler<UpdateCate
         if (request.ParentId.HasValue && request.ParentId == request.Id)
             return Result.Fail("Danh mục không thể là cha của chính nó.");
 
-        entity.Code = request.Code;
+        if (!string.IsNullOrEmpty(request.Code))
+            entity.Code = request.Code;
         entity.Name = request.Name;
         entity.Description = request.Description;
         entity.Icon = request.Icon;

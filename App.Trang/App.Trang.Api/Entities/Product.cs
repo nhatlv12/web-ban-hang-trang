@@ -57,7 +57,7 @@ public class Product : BaseEntity
     public Category Category { get; set; } = null!;
 
     /// <summary>Thông tin kho hàng</summary>
-    public WareHouse? WareHouse { get; set; }
+    public ICollection<WareHouse> WareHouses { get; set; } = new List<WareHouse>();
 
     /// <summary>Danh sách chi tiết đơn hàng liên quan</summary>
     public ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();

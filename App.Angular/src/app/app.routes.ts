@@ -44,10 +44,16 @@ export const routes: Routes = [
     title: 'Kho hàng - Web Bán Hàng Trang'
   },
   {
+    path: 'import-orders',
+    loadComponent: () => import('./pages/import-orders/import-orders.component').then(m => m.ImportOrders),
+    canActivate: [authGuard],
+    title: 'Nhập hàng - Web Bán Hàng Trang'
+  },
+  {
     path: 'orders',
     loadComponent: () => import('./pages/orders/orders.component').then(m => m.Orders),
     canActivate: [authGuard],
-    title: 'Đơn hàng - Web Bán Hàng Trang'
+    title: 'Đơn hàng bán - Web Bán Hàng Trang'
   },
   {
     path: 'forbidden',

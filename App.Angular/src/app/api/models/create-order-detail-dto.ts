@@ -4,6 +4,8 @@
 export interface CreateOrderDetailDto {
   discount?: number;
   productId?: string;
+  providerId?: string | null;
   quantity?: number;
+  tax?: number;
   unitPrice?: number;
 }

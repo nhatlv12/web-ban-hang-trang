@@ -2,6 +2,7 @@ using App.Trang.Api.Common.Models;
 using App.Trang.Api.Features.WareHouses.Commands;
 using App.Trang.Api.Features.WareHouses.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace App.Trang.Api.Endpoints;
 
@@ -31,14 +32,14 @@ public static class WareHouseEndpoints
         return result.Success ? Results.Ok(apiResponse) : Results.BadRequest(apiResponse);
     }
 
-    private static async Task<IResult> GetWareHouseByProductId(Guid productId, IMediator mediator)
+    private static async Task<IResult> GetWareHouseByProductId([FromRoute] Guid productId, IMediator mediator)
     {
         var result = await mediator.Send(new GetWareHouseByProductIdQuery(productId));
         var apiResponse = new ApiResponse<object>(result.Success, result.Message, result.Data);
         return result.Success ? Results.Ok(apiResponse) : Results.BadRequest(apiResponse);
     }
 
-    private static async Task<IResult> UpdateStock(Guid id, UpdateStockCommand cmd, IMediator mediator)
+    private static async Task<IResult> UpdateStock([FromRoute] Guid id, [FromBody] UpdateStockCommand cmd, IMediator mediator)
     {
         if (id != cmd.Id)
             return Results.BadRequest(new ApiResponse(false, "Id không khớp."));

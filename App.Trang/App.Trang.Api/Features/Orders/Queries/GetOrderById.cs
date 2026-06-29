@@ -16,16 +16,18 @@ public class GetOrderByIdHandler(AppDbContext db) : IRequestHandler<GetOrderById
             .Include(o => o.Provider)
             .Include(o => o.Customer)
             .Include(o => o.OrderDetails).ThenInclude(d => d.Product)
+            .Include(o => o.OrderDetails).ThenInclude(d => d.Provider)
             .Where(o => o.Id == request.Id)
             .Select(o => new OrderDto(
                 o.Id, o.Code, o.Type, o.Status, o.OrderDate,
                 o.ProviderId, o.Provider != null ? o.Provider.Name : null,
                 o.CustomerId, o.Customer != null ? o.Customer.FullName : null,
-                o.TotalAmount, o.Discount, o.FinalAmount,
+                o.TotalAmount, o.Discount, o.ShippingFee, o.FinalAmount,
                 o.Note, o.CreatedBy, o.CreatedAt, o.UpdatedAt,
                 o.OrderDetails.Select(d => new OrderDetailDto(
                     d.Id, d.ProductId, d.Product.Code, d.Product.Name,
-                    d.Quantity, d.UnitPrice, d.Discount, d.TotalPrice
+                    d.ProviderId, d.Provider != null ? d.Provider.Name : null,
+                    d.Quantity, d.UnitPrice, d.Discount, d.Tax, d.TotalPrice
                 )).ToList()
             ))
             .FirstOrDefaultAsync(ct);

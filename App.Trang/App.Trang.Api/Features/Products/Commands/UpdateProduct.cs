@@ -2,6 +2,7 @@ using App.Trang.Api.Common.Models;
 using App.Trang.Api.Data;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace App.Trang.Api.Features.Products.Commands;
@@ -28,7 +29,7 @@ public class UpdateProductValidator : AbstractValidator<UpdateProductCommand>
     public UpdateProductValidator()
     {
         RuleFor(x => x.Id).NotEmpty();
-        RuleFor(x => x.Code).NotEmpty().MaximumLength(20);
+        RuleFor(x => x.Code).MaximumLength(20);
         RuleFor(x => x.Name).NotEmpty().MaximumLength(300);
         RuleFor(x => x.Description).MaximumLength(2000);
         RuleFor(x => x.CategoryId).NotEmpty();
@@ -69,7 +70,8 @@ public class UpdateProductHandler(AppDbContext db, IWebHostEnvironment env) : IR
             entity.Image = $"/uploads/products/{fileName}";
         }
 
-        entity.Code = request.Code;
+        if (!string.IsNullOrEmpty(request.Code))
+            entity.Code = request.Code;
         entity.Name = request.Name;
         entity.Description = request.Description;
         entity.CategoryId = request.CategoryId;

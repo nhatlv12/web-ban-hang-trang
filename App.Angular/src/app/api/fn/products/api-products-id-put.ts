@@ -8,18 +8,41 @@ import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
 import { ApiResponse } from '../../models/api-response';
-import { UpdateProductCommand } from '../../models/update-product-command';
 
 export interface ApiProductsIdPut$Params {
   id: string;
-      body: UpdateProductCommand
+  Code: string;
+  Name: string;
+  Description?: string;
+  CategoryId: string;
+  CostPrice: number;
+  SellingPrice: number;
+  OriginalPrice?: number;
+  Unit: string;
+  IsNew: boolean;
+  IsSale: boolean;
+  IsActive: boolean;
+      body?: {
+'Image'?: Blob;
+}
 }
 
 export function apiProductsIdPut(http: HttpClient, rootUrl: string, params: ApiProductsIdPut$Params, context?: HttpContext): Observable<StrictHttpResponse<ApiResponse>> {
   const rb = new RequestBuilder(rootUrl, apiProductsIdPut.PATH, 'put');
   if (params) {
     rb.path('id', params.id, {});
-    rb.body(params.body, 'application/json');
+    rb.query('Code', params.Code, {});
+    rb.query('Name', params.Name, {});
+    rb.query('Description', params.Description, {});
+    rb.query('CategoryId', params.CategoryId, {});
+    rb.query('CostPrice', params.CostPrice, {});
+    rb.query('SellingPrice', params.SellingPrice, {});
+    rb.query('OriginalPrice', params.OriginalPrice, {});
+    rb.query('Unit', params.Unit, {});
+    rb.query('IsNew', params.IsNew, {});
+    rb.query('IsSale', params.IsSale, {});
+    rb.query('IsActive', params.IsActive, {});
+    rb.body(params.body, 'multipart/form-data');
   }
 
   return http.request(

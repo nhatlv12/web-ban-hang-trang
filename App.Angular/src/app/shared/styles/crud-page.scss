@@ -172,6 +172,75 @@
   box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
 }
 
+/* ===== Premium Tabs ===== */
+p-tabs {
+  display: block;
+  margin-top: 1.5rem;
+}
+
+:host ::ng-deep .p-tablist {
+  background: transparent !important;
+  border: none !important;
+}
+
+:host ::ng-deep .p-tablist-tab-list {
+  border-bottom: 2px solid #e2e8f0;
+  gap: 1.5rem;
+  display: flex;
+}
+
+:host ::ng-deep .p-tab,
+:host ::ng-deep p-tab {
+  padding: 0.85rem 1.2rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #64748b;
+  border: none !important;
+  background: transparent !important;
+  position: relative;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:host ::ng-deep .p-tab::after,
+:host ::ng-deep p-tab::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: transparent;
+  border-radius: 3px 3px 0 0;
+  transition: background 0.25s ease;
+}
+
+:host ::ng-deep .p-tab:hover,
+:host ::ng-deep p-tab:hover {
+  color: #1e293b;
+}
+
+:host ::ng-deep .p-tab:hover::after,
+:host ::ng-deep p-tab:hover::after {
+  background: #cbd5e1;
+}
+
+:host ::ng-deep .p-tab[data-p-active="true"],
+:host ::ng-deep .p-tab.p-tab-active,
+:host ::ng-deep p-tab[data-p-active="true"] {
+  color: #10b981 !important;
+}
+
+:host ::ng-deep .p-tab[data-p-active="true"]::after,
+:host ::ng-deep .p-tab.p-tab-active::after,
+:host ::ng-deep p-tab[data-p-active="true"]::after {
+  background: #10b981 !important;
+}
+
 /* ===== Table Card ===== */
 .table-card {
   background: #ffffff;
@@ -198,6 +267,76 @@
   align-items: center;
   gap: 0.85rem;
   flex-wrap: wrap;
+
+  app-searchable-select {
+    width: 220px;
+  }
+
+  p-select {
+    width: 150px;
+  }
+}
+
+.custom-date-picker {
+  display: none;
+}
+
+:host ::ng-deep .toolbar-left {
+  p-datepicker {
+    .p-inputtext {
+      height: 42px;
+      border: 1.5px solid #d1fae5;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      padding: 0 0.8rem;
+      color: #334155;
+      width: 140px;
+      background: #fff;
+      transition: all 0.2s ease;
+      box-shadow: none;
+
+      &:enabled:hover {
+        border-color: #10b981;
+      }
+      
+      &:enabled:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+      }
+    }
+  }
+
+  .p-select {
+    border-radius: 12px !important;
+    border: 1.5px solid #d1fae5 !important;
+    height: 42px !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    align-items: center;
+
+    &:not(.p-disabled):hover {
+      border-color: #10b981 !important;
+    }
+    
+    &.p-focus {
+      border-color: #10b981 !important;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+    }
+
+    .p-select-label {
+      padding: 0 0.85rem !important;
+      font-size: 0.93rem !important;
+      color: #334155 !important;
+      display: flex !important;
+      align-items: center !important;
+      height: 100% !important;
+    }
+
+    .p-select-dropdown {
+      color: #94a3b8 !important;
+      width: 2.5rem !important;
+    }
+  }
 }
 
 .toolbar-right {
@@ -241,6 +380,40 @@
   }
 }
 
+/* ===== Custom Table Select ===== */
+::ng-deep .custom-table-select {
+  height: 40px !important;
+  background: #fff !important;
+  border: 1px solid #d1fae5 !important;
+  border-radius: 6px !important;
+  font-family: inherit;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #10b981 !important;
+  }
+
+  &.p-focus {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+  }
+
+  .p-select-label {
+    padding: 0 0.4rem !important;
+    font-size: 0.9rem !important;
+    color: #334155 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
+  }
+
+  .p-select-dropdown {
+    width: 1.5rem !important;
+    color: #94a3b8 !important;
+  }
+}
+
 /* ===== Filter Chips ===== */
 .filter-chip {
   display: inline-flex;
@@ -280,6 +453,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.65rem;
+  align-items: end;
 }
 
 .form-field {
@@ -710,5 +884,79 @@
   :host ::ng-deep .p-dialog-footer {
     padding: 0.65rem 0.85rem !important;
     gap: 0.5rem;
+  }
+}
+
+/* ======================================================= */
+/* CUSTOM DATEPICKER PANEL (GLOBAL)                        */
+/* ======================================================= */
+::ng-deep .custom-datepicker-panel {
+  padding: 1.25rem !important;
+  width: max-content !important;
+  min-width: 360px !important;
+  box-shadow: 0 12px 40px -10px rgba(0,0,0,0.15) !important;
+  border-radius: 16px !important;
+  border: 1px solid #e2e8f0 !important;
+  background: #fff !important;
+
+  .p-datepicker-header {
+    padding: 0 0 1rem !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    background: transparent !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+
+  .p-datepicker-title {
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    display: flex !important;
+    gap: 0.5rem;
+  }
+
+  .p-datepicker-calendar {
+    margin-top: 0.75rem !important;
+    width: 100% !important;
+
+    th {
+      padding: 0.5rem 0 !important;
+      font-weight: 700 !important;
+      color: #64748b !important;
+      font-size: 0.9rem !important;
+      text-align: center !important;
+    }
+    
+    td {
+      padding: 0.25rem !important;
+      text-align: center !important;
+      
+      > span {
+        width: 2.6rem !important;
+        height: 2.6rem !important;
+        border-radius: 50% !important;
+        font-size: 0.95rem !important;
+        color: #334155 !important;
+        transition: all 0.2s ease !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 auto !important;
+
+        &:not(.p-disabled):not(.p-highlight):not([data-pc-section="day"]):not([aria-selected="true"]):hover {
+          background: #ecfdf5 !important;
+          color: #10b981 !important;
+          font-weight: 600 !important;
+        }
+
+        &.p-highlight, &[aria-selected="true"], &[data-p-highlight="true"] {
+          background: #10b981 !important;
+          color: #ffffff !important;
+          font-weight: 700 !important;
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+        }
+      }
+    }
   }
 }

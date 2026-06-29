@@ -4,16 +4,19 @@ using App.Trang.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace App.Trang.Api.Ef
+namespace App.Trang.Api.EF
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260625160244_updatev1")]
+    partial class updatev1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -398,22 +401,15 @@ namespace App.Trang.Api.Ef
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<int>("TotalExport")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalImport")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProviderId");
+                    b.HasIndex("ProductId")
+                        .IsUnique();
 
-                    b.HasIndex("ProductId", "ProviderId")
-                        .IsUnique()
-                        .HasFilter("[ProviderId] IS NOT NULL");
+                    b.HasIndex("ProviderId");
 
                     b.ToTable("WareHouses");
                 });
@@ -484,8 +480,8 @@ namespace App.Trang.Api.Ef
             modelBuilder.Entity("App.Trang.Api.Entities.WareHouse", b =>
                 {
                     b.HasOne("App.Trang.Api.Entities.Product", "Product")
-                        .WithMany("WareHouses")
-                        .HasForeignKey("ProductId")
+                        .WithOne("WareHouse")
+                        .HasForeignKey("App.Trang.Api.Entities.WareHouse", "ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -520,7 +516,7 @@ namespace App.Trang.Api.Ef
                 {
                     b.Navigation("OrderDetails");
 
-                    b.Navigation("WareHouses");
+                    b.Navigation("WareHouse");
                 });
 
             modelBuilder.Entity("App.Trang.Api.Entities.Provider", b =>

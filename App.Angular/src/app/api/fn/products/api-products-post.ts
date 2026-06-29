@@ -7,17 +7,38 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { CreateProductCommand } from '../../models/create-product-command';
 import { GuidApiResponse } from '../../models/guid-api-response';
 
 export interface ApiProductsPost$Params {
-      body: CreateProductCommand
+  Code: string;
+  Name: string;
+  Description?: string;
+  CategoryId: string;
+  CostPrice: number;
+  SellingPrice: number;
+  OriginalPrice?: number;
+  Unit: string;
+  IsNew: boolean;
+  IsSale: boolean;
+      body?: {
+'Image'?: Blob;
+}
 }
 
 export function apiProductsPost(http: HttpClient, rootUrl: string, params: ApiProductsPost$Params, context?: HttpContext): Observable<StrictHttpResponse<GuidApiResponse>> {
   const rb = new RequestBuilder(rootUrl, apiProductsPost.PATH, 'post');
   if (params) {
-    rb.body(params.body, 'application/json');
+    rb.query('Code', params.Code, {});
+    rb.query('Name', params.Name, {});
+    rb.query('Description', params.Description, {});
+    rb.query('CategoryId', params.CategoryId, {});
+    rb.query('CostPrice', params.CostPrice, {});
+    rb.query('SellingPrice', params.SellingPrice, {});
+    rb.query('OriginalPrice', params.OriginalPrice, {});
+    rb.query('Unit', params.Unit, {});
+    rb.query('IsNew', params.IsNew, {});
+    rb.query('IsSale', params.IsSale, {});
+    rb.body(params.body, 'multipart/form-data');
   }
 
   return http.request(

@@ -43,6 +43,10 @@ public class Order : BaseEntity
     [MaxLength(1000)]
     public string? Note { get; set; }
 
+    /// <summary>Phí vận chuyển</summary>
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal ShippingFee { get; set; } = 0;
+
     /// <summary>Người tạo</summary>
     [MaxLength(100)]
     public string? CreatedBy { get; set; }

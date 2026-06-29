@@ -46,6 +46,14 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// ===== Seed dữ liệu ban đầu =====
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await DbSeeder.SeedAsync(db);
+}
+
+
 // ===== Middleware =====
 if (app.Environment.IsDevelopment())
 {

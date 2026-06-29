@@ -21,7 +21,9 @@ public class GetWareHouseByProductIdHandler(AppDbContext db)
                 w.Id, w.ProductId, w.Product.Code, w.Product.Name,
                 w.ProviderId, w.Provider != null ? w.Provider.Name : null,
                 w.Quantity, w.MinQuantity, w.MaxQuantity,
-                w.Location, w.LastStockUpdate,
+                w.TotalImport, w.TotalExport,
+                w.Location, w.CostPrice, w.ImportDate,
+                w.LastStockUpdate,
                 w.CreatedAt, w.UpdatedAt
             ))
             .FirstOrDefaultAsync(ct);

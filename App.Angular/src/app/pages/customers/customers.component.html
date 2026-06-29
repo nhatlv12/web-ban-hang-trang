@@ -100,8 +100,7 @@
         <label class="ss-label">Giới tính</label>
         <app-searchable-select [(ngModel)]="form.gender" [options]="genderOptions" placeholder="Chọn giới tính..." [searchable]="false" />
       </div>
-      <div class="form-field"><p-floatlabel variant="on"><p-datepicker id="cust_dob" [(ngModel)]="form.dateOfBirth"
-            dateFormat="dd/mm/yy" [showIcon]="true" /><label for="cust_dob">Ngày sinh</label></p-floatlabel></div>
+      <div class="form-field"><p-floatlabel variant="on"><p-datepicker id="cust_dob" [(ngModel)]="form.dateOfBirth" dateFormat="dd/mm/yy" [showIcon]="true" panelStyleClass="custom-datepicker-panel" /><label for="cust_dob">Ngày sinh</label></p-floatlabel></div>
       <div class="form-field form-field-full"><p-floatlabel variant="on"><input pInputText id="cust_addr"
             [(ngModel)]="form.address" /><label for="cust_addr">Địa chỉ</label></p-floatlabel></div>
       <div class="form-field form-field-full"><p-floatlabel variant="on"><textarea pTextarea id="cust_note"

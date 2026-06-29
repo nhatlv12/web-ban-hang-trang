@@ -9,7 +9,9 @@ public record WareHouseDto(
     Guid Id, Guid ProductId, string ProductCode, string ProductName,
     Guid? ProviderId, string? ProviderName,
     int Quantity, int MinQuantity, int MaxQuantity,
-    string? Location, DateTime LastStockUpdate,
+    int TotalImport, int TotalExport,
+    string? Location, decimal CostPrice, DateTime? ImportDate,
+    DateTime LastStockUpdate,
     DateTime CreatedAt, DateTime? UpdatedAt
 );
 
@@ -28,7 +30,9 @@ public class GetWareHousesHandler(AppDbContext db) : IRequestHandler<GetWareHous
                 w.Id, w.ProductId, w.Product.Code, w.Product.Name,
                 w.ProviderId, w.Provider != null ? w.Provider.Name : null,
                 w.Quantity, w.MinQuantity, w.MaxQuantity,
-                w.Location, w.LastStockUpdate,
+                w.TotalImport, w.TotalExport,
+                w.Location, w.CostPrice, w.ImportDate,
+                w.LastStockUpdate,
                 w.CreatedAt, w.UpdatedAt
             ))
             .ToListAsync(ct);

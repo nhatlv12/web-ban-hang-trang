@@ -57,14 +57,14 @@ public class AppDbContext : DbContext
                   .OnDelete(DeleteBehavior.Restrict);
         });
 
-        // ===== WareHouse (1-1 with Product) =====
+        // ===== WareHouse (1-N with Product) =====
         modelBuilder.Entity<WareHouse>(entity =>
         {
-            entity.HasIndex(e => e.ProductId).IsUnique();
+            entity.HasIndex(e => new { e.ProductId, e.ProviderId }).IsUnique();
 
             entity.HasOne(e => e.Product)
-                  .WithOne(e => e.WareHouse)
-                  .HasForeignKey<WareHouse>(e => e.ProductId)
+                  .WithMany(e => e.WareHouses)
+                  .HasForeignKey(e => e.ProductId)
                   .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(e => e.Provider)
