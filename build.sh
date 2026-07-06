@@ -19,6 +19,10 @@ echo "Publishing Backend..."
 cd "$ROOT_DIR/App.Trang/App.Trang.Api"
 dotnet publish -c Release -o "$BE_PUBLISH_DIR"
 
+# Enable IIS stdout logging
+echo "Enabling stdout logging for backend..."
+sed -i 's/stdoutLogEnabled="false"/stdoutLogEnabled="true"/g' "$BE_PUBLISH_DIR/web.config"
+mkdir -p "$BE_PUBLISH_DIR/logs"
 # Publish Frontend
 echo "Publishing Frontend..."
 cd "$ROOT_DIR/App.Angular"
