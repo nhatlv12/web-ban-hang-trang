@@ -23,6 +23,10 @@ dotnet publish -c Release -o "$BE_PUBLISH_DIR"
 echo "Enabling stdout logging for backend..."
 sed -i 's/stdoutLogEnabled="false"/stdoutLogEnabled="true"/g' "$BE_PUBLISH_DIR/web.config"
 mkdir -p "$BE_PUBLISH_DIR/logs"
+
+# Copy custom appsettings.json to Backend
+echo "Copying custom appsettings.json..."
+cp "$ROOT_DIR/appsettings.json" "$BE_PUBLISH_DIR/appsettings.json"
 # Publish Frontend
 echo "Publishing Frontend..."
 cd "$ROOT_DIR/App.Angular"
