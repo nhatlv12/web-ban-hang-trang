@@ -33,3 +33,6 @@ tmp/
 coverage/
 npm-debug.log
 yarn-error.log
+
+# Publish folder
+publish/
