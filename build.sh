@@ -22,8 +22,8 @@ dotnet publish -c Release -o "$BE_PUBLISH_DIR"
 # Publish Frontend
 echo "Publishing Frontend..."
 cd "$ROOT_DIR/App.Angular"
-# Uncomment the line below if you want to install dependencies before building
-# npm install
+# Install dependencies and build
+npm install
 npm run build
 
 # Copy Frontend to publish/fe
