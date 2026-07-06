@@ -50,6 +50,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync(); // Tự động tạo bảng nếu chưa có
     await DbSeeder.SeedAsync(db);
 }
 
