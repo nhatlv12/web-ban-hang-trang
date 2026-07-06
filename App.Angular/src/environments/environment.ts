@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.webbanhangtrang.com/api',
+  apiUrl: 'http://192.168.1.20:8080/api',
   appName: 'Web Bán Hàng Trang'
 };
