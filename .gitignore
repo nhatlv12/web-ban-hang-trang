@@ -6,12 +6,12 @@
 *.sln.docstates
 
 # Build results
-[Dd]ebug/
-[Rr]elease/
+**/[Dd]ebug/
+**/[Rr]elease/
 x64/
 x86/
-[Bb]in/
-[Oo]bj/
+**/[Bb]in/
+**/[Oo]bj/
 
 # NuGet
 *.nupkg

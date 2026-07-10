@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("App.Trang.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+836e4cdcf192637a08f6c69ecdf60dc7ae778330")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e8bd56c168863593a9daf2ddcac073ae8e4fc389")]
 [assembly: System.Reflection.AssemblyProductAttribute("App.Trang.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("App.Trang.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

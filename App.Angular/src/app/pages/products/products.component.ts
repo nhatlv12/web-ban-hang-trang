@@ -202,8 +202,8 @@ export class Products implements OnInit {
   }
 
   async saveItem() {
-    if (!this.form.code || !this.form.name) {
-      this.messageService.add({ severity: 'warn', summary: 'Thiếu thông tin', detail: 'Vui lòng nhập mã và tên sản phẩm.', life: 3000 });
+    if ((!this.autoCode && !this.form.code) || !this.form.name || !this.form.categoryId) {
+      this.messageService.add({ severity: 'warn', summary: 'Thiếu thông tin', detail: 'Vui lòng nhập các trường bắt buộc.', life: 3000 });
       return;
     }
     try {
