@@ -49,10 +49,10 @@
     </p-table>
   </div>
 
-  <p-dialog [(visible)]="dialogVisible" header="🛒 Tạo đơn hàng bán" [modal]="true" [style]="{ width: '66vw' }" [contentStyle]="{ overflow: 'visible' }" [draggable]="false">
+  <p-dialog [(visible)]="dialogVisible" header="🛒 Tạo đơn hàng bán" [modal]="true" [style]="{ width: '66vw' }" [draggable]="false">
     <div class="form-grid">
       <div class="form-field"><p-floatlabel variant="on"><input pInputText id="exp_code" [(ngModel)]="form.code" /><label for="exp_code">Mã đơn (tự sinh nếu để trống)</label></p-floatlabel></div>
-      <div class="form-field"><p-floatlabel variant="on"><p-datepicker id="exp_date" [(ngModel)]="form.orderDate" dateFormat="dd/mm/yy" [showIcon]="true" panelStyleClass="custom-datepicker-panel" /><label for="exp_date">Ngày bán</label></p-floatlabel></div>
+      <div class="form-field"><p-floatlabel variant="on"><p-datepicker id="exp_date" [(ngModel)]="form.orderDate" dateFormat="dd/mm/yy" [showIcon]="true" panelStyleClass="custom-datepicker-panel" appendTo="body" /><label for="exp_date">Ngày bán</label></p-floatlabel></div>
       <div class="form-field form-field-full">
         <label class="ss-label">Khách hàng *</label>
         <app-searchable-select [(ngModel)]="form.customerId" [options]="customerOptions" placeholder="Chọn khách hàng..." />
@@ -60,9 +60,9 @@
     </div>
 
     <h3 style="margin:1.5rem 0 0.8rem;font-size:0.95rem;color:var(--p-text-color)"><i class="pi pi-list" style="margin-right:0.5rem"></i>Chi tiết sản phẩm</h3>
-    <div style="overflow-x:auto">
+    <div style="overflow-x:auto; max-height: 45vh; overflow-y: auto; border: 1px solid var(--p-surface-200); border-radius: 8px;">
       <table style="width:100%;border-collapse:collapse;font-size:0.88rem">
-        <thead>
+        <thead style="position: sticky; top: 0; z-index: 10;">
           <tr style="background:var(--p-surface-100);border-bottom:2px solid var(--p-surface-200)">
             <th style="text-align:left;padding:0.6rem">Sản phẩm</th>
             <th style="text-align:center;padding:0.6rem;width:80px">SL</th>
@@ -137,17 +137,18 @@
       </div>
     </div>
     <h3 style="margin:0 0 1rem;font-size:1rem;color:var(--p-text-color)"><i class="pi pi-list" style="margin-right:0.5rem"></i>Danh sách sản phẩm</h3>
-    <table style="width:100%;border-collapse:collapse;font-size:0.9rem;border:1px solid var(--p-surface-200);border-radius:8px;overflow:hidden">
-      <thead>
-        <tr style="background:var(--p-surface-100);border-bottom:2px solid var(--p-surface-200)">
-          <th style="text-align:left;padding:0.8rem">Sản phẩm</th>
-          <th style="text-align:center;padding:0.8rem">SL</th>
-          <th style="text-align:right;padding:0.8rem">Đơn giá</th>
-          <th style="text-align:right;padding:0.8rem">Chiết khấu</th>
-          <th style="text-align:right;padding:0.8rem">Thuế</th>
-          <th style="text-align:right;padding:0.8rem">Thành tiền</th>
-        </tr>
-      </thead>
+    <div style="overflow-x:auto; max-height: 45vh; overflow-y: auto; border: 1px solid var(--p-surface-200); border-radius: 8px;">
+      <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+        <thead style="position: sticky; top: 0; z-index: 10;">
+          <tr style="background:var(--p-surface-100);border-bottom:2px solid var(--p-surface-200)">
+            <th style="text-align:left;padding:0.8rem">Sản phẩm</th>
+            <th style="text-align:center;padding:0.8rem">SL</th>
+            <th style="text-align:right;padding:0.8rem">Đơn giá</th>
+            <th style="text-align:right;padding:0.8rem">Chiết khấu</th>
+            <th style="text-align:right;padding:0.8rem">Thuế</th>
+            <th style="text-align:right;padding:0.8rem">Thành tiền</th>
+          </tr>
+        </thead>
       <tbody>
         @for (line of viewedOrder().details; track $index) {
         <tr style="border-bottom:1px solid var(--p-surface-200)">
@@ -164,7 +165,8 @@
         </tr>
         }
       </tbody>
-    </table>
+      </table>
+    </div>
     <div style="margin-top:1.5rem;padding:1rem;background:var(--p-surface-50);border-radius:12px;display:flex;flex-direction:column;gap:0.6rem;width:350px;margin-left:auto">
       <div style="display:flex;justify-content:space-between"><span>Tổng tiền hàng:</span><strong>{{ formatPrice(viewedOrder().totalAmount) }}</strong></div>
       <div style="display:flex;justify-content:space-between"><span>Giảm giá:</span><strong style="color:#10b981;font-size:1.1rem">{{ viewedOrder().discount > 0 ? formatPrice(viewedOrder().discount) : '0đ' }}</strong></div>
