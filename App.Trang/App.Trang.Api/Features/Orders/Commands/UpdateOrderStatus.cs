@@ -51,29 +51,6 @@ public class UpdateOrderStatusHandler(AppDbContext db) : IRequestHandler<UpdateO
                 wareHouse.LastStockUpdate = DateTime.UtcNow;
             }
         }
-        else if (request.Status == OrderStatus.Completed && order.Status != OrderStatus.Completed)
-        {
-            // Chức năng ngầm: nếu cập nhật đơn nhập thành Hoàn thành thì cộng kho
-            foreach (var detail in order.OrderDetails)
-            {
-                var providerIdToUse = detail.ProviderId ?? order.ProviderId;
-                var wareHouse = await db.WareHouses.FirstOrDefaultAsync(w => w.ProductId == detail.ProductId && w.ProviderId == providerIdToUse, ct);
-                if (wareHouse == null)
-                {
-                    wareHouse = new WareHouse { ProductId = detail.ProductId, ProviderId = providerIdToUse, Quantity = 0 };
-                    db.WareHouses.Add(wareHouse);
-                }
-
-                if (order.Type == OrderType.Import)
-                {
-                    wareHouse.Quantity += detail.Quantity;
-                    wareHouse.TotalImport += detail.Quantity;
-                    wareHouse.ImportDate = order.OrderDate;
-                    wareHouse.LastStockUpdate = DateTime.UtcNow;
-                }
-            }
-        }
-
         order.Status = request.Status;
         await db.SaveChangesAsync(ct);
 

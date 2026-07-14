@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using App.Trang.Api.Common.Models;
 using App.Trang.Api.Data;
 using App.Trang.Api.Entities;
@@ -7,8 +8,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace App.Trang.Api.Features.Orders.Commands;
 
-// === DTO cho chi tiết đơn hàng khi tạo ===
-public record CreateOrderDetailDto(
+// === DTO cho chi tiết đơn hàng khi cập nhật ===
+public record UpdateOrderDetailDto(
     Guid ProductId,
     int Quantity,
     decimal UnitPrice,
@@ -18,7 +19,7 @@ public record CreateOrderDetailDto(
 );
 
 // === Command ===
-public record CreateOrderCommand(
+public record UpdateOrderCommand(
     string Code,
     OrderType Type,
     DateTime OrderDate,
@@ -27,14 +28,17 @@ public record CreateOrderCommand(
     decimal Discount,
     decimal ShippingFee,
     string? Note,
-    string? CreatedBy,
-    List<CreateOrderDetailDto> Details
-) : IRequest<Result<Guid>>;
+    List<UpdateOrderDetailDto> Details
+) : IRequest<Result<Guid>>
+{
+    [JsonIgnore]
+    public Guid Id { get; set; }
+}
 
 // === Validator ===
-public class CreateOrderValidator : AbstractValidator<CreateOrderCommand>
+public class UpdateOrderValidator : AbstractValidator<UpdateOrderCommand>
 {
-    public CreateOrderValidator()
+    public UpdateOrderValidator()
     {
         RuleFor(x => x.Code).MaximumLength(20);
         RuleFor(x => x.Type).IsInEnum();
@@ -48,9 +52,6 @@ public class CreateOrderValidator : AbstractValidator<CreateOrderCommand>
             detail.RuleFor(d => d.Discount).GreaterThanOrEqualTo(0);
         });
 
-        // Bỏ validate ProviderId ở header theo yêu cầu của user
-
-        // Phiếu xuất phải có khách hàng
         RuleFor(x => x.CustomerId)
             .NotEmpty().When(x => x.Type == OrderType.Export)
             .WithMessage("Phiếu xuất phải chọn khách hàng.");
@@ -58,20 +59,48 @@ public class CreateOrderValidator : AbstractValidator<CreateOrderCommand>
 }
 
 // === Handler ===
-public class CreateOrderHandler(AppDbContext db) : IRequestHandler<CreateOrderCommand, Result<Guid>>
+public class UpdateOrderHandler(AppDbContext db) : IRequestHandler<UpdateOrderCommand, Result<Guid>>
 {
-    public async Task<Result<Guid>> Handle(CreateOrderCommand request, CancellationToken ct)
+    public async Task<Result<Guid>> Handle(UpdateOrderCommand request, CancellationToken ct)
     {
-        // Tự sinh mã nếu không truyền
-        var code = string.IsNullOrWhiteSpace(request.Code)
-            ? Common.Helpers.CodeGenerator.Generate(c => db.Orders.Any(o => o.Code == c), "ORD_")
-            : request.Code;
+        var order = await db.Orders
+            .Include(o => o.OrderDetails)
+            .FirstOrDefaultAsync(o => o.Id == request.Id, ct);
 
-        // Kiểm tra mã đơn hàng
-        if (await db.Orders.AnyAsync(o => o.Code == code, ct))
+        if (order is null)
+            return Result<Guid>.Fail("Đơn hàng không tồn tại.");
+
+        if (order.Status == OrderStatus.Completed || order.Status == OrderStatus.Cancelled)
+            return Result<Guid>.Fail("Không thể sửa đơn hàng đã hoàn thành hoặc đã hủy.");
+
+        var code = string.IsNullOrWhiteSpace(request.Code) ? order.Code : request.Code;
+        if (code != order.Code && await db.Orders.AnyAsync(o => o.Code == code, ct))
             return Result<Guid>.Fail($"Mã đơn hàng '{code}' đã tồn tại.");
 
-        // Kiểm tra tồn kho khi xuất hàng
+        // Hoàn trả tồn kho từ chi tiết cũ
+        foreach (var oldDetail in order.OrderDetails)
+        {
+            var providerIdToUse = oldDetail.ProviderId ?? order.ProviderId;
+            var wareHouse = await db.WareHouses
+                .FirstOrDefaultAsync(w => w.ProductId == oldDetail.ProductId && w.ProviderId == providerIdToUse, ct);
+
+            if (wareHouse != null)
+            {
+                if (order.Type == OrderType.Import)
+                {
+                    wareHouse.Quantity -= oldDetail.Quantity;
+                    wareHouse.TotalImport -= oldDetail.Quantity;
+                }
+                else
+                {
+                    wareHouse.Quantity += oldDetail.Quantity;
+                    wareHouse.TotalExport -= oldDetail.Quantity;
+                }
+                wareHouse.LastStockUpdate = DateTime.UtcNow;
+            }
+        }
+
+        // Kiểm tra tồn kho mới cho phiếu xuất
         if (request.Type == OrderType.Export)
         {
             foreach (var detail in request.Details)
@@ -85,26 +114,23 @@ public class CreateOrderHandler(AppDbContext db) : IRequestHandler<CreateOrderCo
                 if (wareHouse.Quantity < detail.Quantity)
                 {
                     var product = await db.Products.FindAsync([detail.ProductId], ct);
-                    return Result<Guid>.Fail(
-                        $"Sản phẩm '{product?.Name}' không đủ tồn kho. Hiện có: {wareHouse.Quantity}, yêu cầu: {detail.Quantity}.");
+                    return Result<Guid>.Fail($"Sản phẩm '{product?.Name}' không đủ tồn kho. Hiện có: {wareHouse.Quantity}, yêu cầu: {detail.Quantity}.");
                 }
             }
         }
 
-        // Tạo đơn hàng
-        var order = new Order
-        {
-            Code = code,
-            Type = request.Type,
-            Status = OrderStatus.Pending,
-            OrderDate = request.OrderDate,
-            ProviderId = request.ProviderId,
-            CustomerId = request.CustomerId,
-            Discount = request.Discount,
-            ShippingFee = request.ShippingFee,
-            Note = request.Note,
-            CreatedBy = request.CreatedBy
-        };
+        // Cập nhật thông tin chung
+        order.Code = code;
+        order.OrderDate = request.OrderDate;
+        order.ProviderId = request.ProviderId;
+        order.CustomerId = request.CustomerId;
+        order.Discount = request.Discount;
+        order.ShippingFee = request.ShippingFee;
+        order.Note = request.Note;
+
+        // Xóa chi tiết cũ và tạo chi tiết mới
+        db.OrderDetails.RemoveRange(order.OrderDetails);
+        order.OrderDetails.Clear();
 
         decimal totalAmount = 0;
         foreach (var detail in request.Details)
@@ -127,9 +153,7 @@ public class CreateOrderHandler(AppDbContext db) : IRequestHandler<CreateOrderCo
         order.TotalAmount = totalAmount;
         order.FinalAmount = totalAmount - request.Discount + request.ShippingFee;
 
-        db.Orders.Add(order);
-
-        // Cập nhật tồn kho
+        // Cập nhật lại tồn kho theo chi tiết mới
         foreach (var detail in request.Details)
         {
             var providerIdToUse = detail.ProviderId ?? request.ProviderId;
@@ -165,6 +189,6 @@ public class CreateOrderHandler(AppDbContext db) : IRequestHandler<CreateOrderCo
 
         await db.SaveChangesAsync(ct);
 
-        return Result<Guid>.Ok(order.Id, "Tạo đơn hàng thành công.");
+        return Result<Guid>.Ok(order.Id, "Cập nhật đơn hàng thành công.");
     }
 }

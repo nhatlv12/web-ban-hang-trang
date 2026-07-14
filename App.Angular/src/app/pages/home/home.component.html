@@ -6,7 +6,7 @@
       <p>Tổng quan hoạt động kinh doanh của bạn</p>
     </div>
     <div class="welcome-right">
-      <app-searchable-select class="period-select" [(ngModel)]="selectedPeriod" [options]="periodOptions" [searchable]="false" />
+      <app-searchable-select class="period-select" [ngModel]="selectedPeriod" (ngModelChange)="onPeriodChange($event)" [options]="periodOptions" [searchable]="false" />
     </div>
   </div>
 
@@ -17,40 +17,56 @@
         <svg lucideShoppingCart [size]="26" color="#fff"></svg>
       </div>
       <div class="stat-details">
-        <span class="stat-value">156</span>
+        <span class="stat-value">{{ stats().totalOrders }}</span>
         <span class="stat-label">Đơn hàng</span>
       </div>
-      <div class="stat-trend trend-up"><svg lucideArrowUpRight [size]="14"></svg> 12.5%</div>
+      <div class="stat-trend" [ngClass]="stats().ordersTrend >= 0 ? 'trend-up' : 'trend-down'">
+        <svg *ngIf="stats().ordersTrend >= 0" lucideArrowUpRight [size]="14"></svg>
+        <svg *ngIf="stats().ordersTrend < 0" lucideArrowDownRight [size]="14"></svg>
+        {{ getAbs(stats().ordersTrend) }}%
+      </div>
     </div>
     <div class="stat-card">
       <div class="stat-icon stat-icon-green">
         <svg lucidePackage [size]="26" color="#fff"></svg>
       </div>
       <div class="stat-details">
-        <span class="stat-value">1,248</span>
+        <span class="stat-value">{{ stats().totalProducts }}</span>
         <span class="stat-label">Sản phẩm</span>
       </div>
-      <div class="stat-trend trend-up"><svg lucideArrowUpRight [size]="14"></svg> 8.3%</div>
+      <div class="stat-trend" [ngClass]="stats().productsTrend >= 0 ? 'trend-up' : 'trend-down'">
+        <svg *ngIf="stats().productsTrend >= 0" lucideArrowUpRight [size]="14"></svg>
+        <svg *ngIf="stats().productsTrend < 0" lucideArrowDownRight [size]="14"></svg>
+        {{ getAbs(stats().productsTrend) }}%
+      </div>
     </div>
     <div class="stat-card">
       <div class="stat-icon stat-icon-orange">
         <svg lucideUsers [size]="26" color="#fff"></svg>
       </div>
       <div class="stat-details">
-        <span class="stat-value">342</span>
+        <span class="stat-value">{{ stats().totalCustomers }}</span>
         <span class="stat-label">Khách hàng</span>
       </div>
-      <div class="stat-trend trend-up"><svg lucideArrowUpRight [size]="14"></svg> 5.1%</div>
+      <div class="stat-trend" [ngClass]="stats().customersTrend >= 0 ? 'trend-up' : 'trend-down'">
+        <svg *ngIf="stats().customersTrend >= 0" lucideArrowUpRight [size]="14"></svg>
+        <svg *ngIf="stats().customersTrend < 0" lucideArrowDownRight [size]="14"></svg>
+        {{ getAbs(stats().customersTrend) }}%
+      </div>
     </div>
     <div class="stat-card">
       <div class="stat-icon stat-icon-cyan">
         <svg lucideWallet [size]="26" color="#fff"></svg>
       </div>
       <div class="stat-details">
-        <span class="stat-value">{{ formatPrice(1280000000) }}</span>
+        <span class="stat-value">{{ formatPrice(stats().totalRevenue) }}</span>
         <span class="stat-label">Doanh thu</span>
       </div>
-      <div class="stat-trend trend-up"><svg lucideArrowUpRight [size]="14"></svg> 18.2%</div>
+      <div class="stat-trend" [ngClass]="stats().revenueTrend >= 0 ? 'trend-up' : 'trend-down'">
+        <svg *ngIf="stats().revenueTrend >= 0" lucideArrowUpRight [size]="14"></svg>
+        <svg *ngIf="stats().revenueTrend < 0" lucideArrowDownRight [size]="14"></svg>
+        {{ getAbs(stats().revenueTrend) }}%
+      </div>
     </div>
   </div>
 
@@ -108,19 +124,19 @@
       <div class="summary-list">
         <div class="summary-item">
           <div class="summary-icon si-blue"><svg lucideDownload [size]="18" color="#fff"></svg></div>
-          <div class="summary-text"><span class="summary-label">Tổng nhập kho</span><span class="summary-value">{{ formatFullPrice(1400000000) }}</span></div>
+          <div class="summary-text"><span class="summary-label">Tổng nhập kho</span><span class="summary-value">{{ formatFullPrice(stats().totalImportMonth) }}</span></div>
         </div>
         <div class="summary-item">
           <div class="summary-icon si-green"><svg lucideUpload [size]="18" color="#fff"></svg></div>
-          <div class="summary-text"><span class="summary-label">Tổng xuất kho</span><span class="summary-value">{{ formatFullPrice(1280000000) }}</span></div>
+          <div class="summary-text"><span class="summary-label">Tổng xuất kho</span><span class="summary-value">{{ formatFullPrice(stats().totalExportMonth) }}</span></div>
         </div>
         <div class="summary-item">
           <div class="summary-icon si-purple"><svg lucideTrendingUp [size]="18" color="#fff"></svg></div>
-          <div class="summary-text"><span class="summary-label">Lợi nhuận ước tính</span><span class="summary-value profit">{{ formatFullPrice(380000000) }}</span></div>
+          <div class="summary-text"><span class="summary-label">Lợi nhuận ước tính</span><span class="summary-value profit">{{ formatFullPrice(stats().estimatedProfit) }}</span></div>
         </div>
         <div class="summary-item">
           <div class="summary-icon si-orange"><svg lucideShoppingCart [size]="18" color="#fff"></svg></div>
-          <div class="summary-text"><span class="summary-label">Đơn hàng mới hôm nay</span><span class="summary-value">12</span></div>
+          <div class="summary-text"><span class="summary-label">Đơn hàng mới hôm nay</span><span class="summary-value">{{ stats().newOrdersToday }}</span></div>
         </div>
       </div>
     </div>
@@ -135,7 +151,7 @@
       </div>
       <a routerLink="/orders" class="view-all-link">Xem tất cả →</a>
     </div>
-    <p-table [value]="recentOrders" [rows]="5" [rowHover]="true" styleClass="recent-orders-table">
+    <p-table [value]="recentOrders()" [rows]="5" [rowHover]="true" styleClass="recent-orders-table">
       <ng-template #header>
         <tr>
           <th style="width:140px">Mã đơn</th>

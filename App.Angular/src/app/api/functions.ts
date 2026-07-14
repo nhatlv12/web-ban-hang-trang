@@ -25,6 +25,8 @@ export type { ApiOrdersGet$Params as ApiOrdersGet$Params } from './fn/orders/api
 export { apiOrdersGet as apiOrdersGet } from './fn/orders/api-orders-get';
 export type { ApiOrdersPost$Params as ApiOrdersPost$Params } from './fn/orders/api-orders-post';
 export { apiOrdersPost as apiOrdersPost } from './fn/orders/api-orders-post';
+export type { ApiOrdersIdPut$Params as ApiOrdersIdPut$Params } from './fn/orders/api-orders-id-put';
+export { apiOrdersIdPut as apiOrdersIdPut } from './fn/orders/api-orders-id-put';
 export type { ApiOrdersIdGet$Params as ApiOrdersIdGet$Params } from './fn/orders/api-orders-id-get';
 export { apiOrdersIdGet as apiOrdersIdGet } from './fn/orders/api-orders-id-get';
 export type { ApiOrdersIdStatusPut$Params as ApiOrdersIdStatusPut$Params } from './fn/orders/api-orders-id-status-put';
@@ -57,3 +59,5 @@ export type { ApiWarehousesProductProductIdGet$Params as ApiWarehousesProductPro
 export { apiWarehousesProductProductIdGet as apiWarehousesProductProductIdGet } from './fn/ware-houses/api-warehouses-product-product-id-get';
 export type { ApiWarehousesIdPut$Params as ApiWarehousesIdPut$Params } from './fn/ware-houses/api-warehouses-id-put';
 export { apiWarehousesIdPut as apiWarehousesIdPut } from './fn/ware-houses/api-warehouses-id-put';
+export type { ApiDashboardGet$Params as ApiDashboardGet$Params } from './fn/dashboard/api-dashboard-get';
+export { apiDashboardGet as apiDashboardGet } from './fn/dashboard/api-dashboard-get';

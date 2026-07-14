@@ -25,6 +25,10 @@ public static class OrderEndpoints
              .Produces<ApiResponse<Guid>>(StatusCodes.Status200OK)
              .Produces<ApiResponse>(StatusCodes.Status400BadRequest);
 
+        group.MapPut("/{id:guid}", UpdateOrder)
+             .Produces<ApiResponse<Guid>>(StatusCodes.Status200OK)
+             .Produces<ApiResponse>(StatusCodes.Status400BadRequest);
+
         group.MapPut("/{id:guid}/status", UpdateOrderStatus)
              .Produces<ApiResponse>(StatusCodes.Status200OK)
              .Produces<ApiResponse>(StatusCodes.Status400BadRequest);
@@ -50,6 +54,14 @@ public static class OrderEndpoints
 
     private static async Task<IResult> CreateOrder([FromBody] CreateOrderCommand cmd, IMediator mediator)
     {
+        var result = await mediator.Send(cmd);
+        var apiResponse = new ApiResponse<Guid>(result.Success, result.Message, result.Data);
+        return result.Success ? Results.Ok(apiResponse) : Results.BadRequest(apiResponse);
+    }
+
+    private static async Task<IResult> UpdateOrder([FromRoute] Guid id, [FromBody] UpdateOrderCommand cmd, IMediator mediator)
+    {
+        cmd.Id = id;
         var result = await mediator.Send(cmd);
         var apiResponse = new ApiResponse<Guid>(result.Success, result.Message, result.Data);
         return result.Success ? Results.Ok(apiResponse) : Results.BadRequest(apiResponse);

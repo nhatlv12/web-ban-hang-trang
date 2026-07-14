@@ -100,5 +100,6 @@ app.MapCategoryEndpoints();
 app.MapProductEndpoints();
 app.MapWareHouseEndpoints();
 app.MapOrderEndpoints();
+app.MapDashboardEndpoints();
 
 app.Run();

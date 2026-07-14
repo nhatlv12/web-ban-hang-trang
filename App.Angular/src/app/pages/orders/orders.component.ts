@@ -16,7 +16,7 @@ import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Api } from '../../api/api';
-import { apiOrdersGet, apiOrdersPost, apiCustomersGet, apiProductsGet, apiOrdersIdGet, apiOrdersIdStatusPut } from '../../api/functions';
+import { apiOrdersGet, apiOrdersPost, apiCustomersGet, apiProductsGet, apiOrdersIdGet, apiOrdersIdStatusPut, apiOrdersIdPut } from '../../api/functions';
 import { OrderType } from '../../api/models/order-type';
 import { SearchableSelectComponent } from '../../shared/components/searchable-select/searchable-select.component';
 
@@ -42,6 +42,7 @@ interface DetailLine {
 export class Orders implements OnInit {
   items = signal<OrderItem[]>([]);
   dialogVisible = signal(false);
+  isSaving = signal(false);
   viewDialogVisible = signal(false);
   viewedOrder = signal<any>(null);
   searchValue = signal('');
@@ -133,7 +134,6 @@ export class Orders implements OnInit {
       }));
 
       this.productOptions = allProducts
-        .filter((p: any) => p.stockQuantity > 0)
         .map((p: any) => ({ 
           label: `${p.code} - ${p.name} (Tồn: ${p.stockQuantity})`, 
           value: p.id, 
@@ -157,6 +157,50 @@ export class Orders implements OnInit {
 
   addLine() { this.details.update(d => [...d, { productId: '', productName: '', quantity: 1, unitPrice: null as any, discount: null as any, tax: null as any, costPrice: null as any, discountType: 'amount' }]); }
   removeLine(i: number) { this.details.update(d => d.filter((_, idx) => idx !== i)); }
+
+  async editItem(id: string) {
+    try {
+      const res: any = await this.api.invoke(apiOrdersIdGet, { id });
+      if (res?.data) {
+        const order = res.data;
+        if (order.status > 1) {
+          this.messageService.add({ severity: 'warn', summary: 'Cảnh báo', detail: 'Chỉ có thể sửa đơn ở trạng thái Nháp hoặc Chờ xử lý.', life: 3000 });
+          return;
+        }
+        this.form = {
+          id: order.id,
+          code: order.code,
+          type: order.type,
+          status: order.status,
+          orderDate: new Date(order.orderDate),
+          customerId: order.customerId,
+          discountValue: order.discount,
+          discountType: 'amount',
+          shippingFee: order.shippingFee,
+          note: order.note || ''
+        };
+        this.details.set(order.details.map((d: any) => {
+          const rawBase = d.quantity * d.unitPrice;
+          const base = rawBase - (d.discount || 0);
+          const taxPercent = base > 0 ? Math.round(((d.tax || 0) / base) * 100) : 0;
+          return {
+            productId: d.productId,
+            productName: d.productName,
+            quantity: d.quantity,
+            unitPrice: d.unitPrice,
+            discount: d.discount,
+            tax: taxPercent,
+            discountType: 'amount',
+            costPrice: 0
+          };
+        }));
+        this.dialogVisible.set(true);
+      }
+    } catch (err) {
+      console.error(err);
+      this.messageService.add({ severity: 'error', summary: 'Lỗi', detail: 'Không thể tải chi tiết đơn hàng để sửa.', life: 3000 });
+    }
+  }
 
   async viewItem(id: string) {
     try {
@@ -253,14 +297,23 @@ export class Orders implements OnInit {
       })
     };
 
+    this.isSaving.set(true);
     try {
-      await this.api.invoke(apiOrdersPost, { body });
-      this.messageService.add({ severity: 'success', summary: 'Thành công', detail: 'Đơn hàng bán đã được tạo.', life: 3000 });
+      if (this.form.id) {
+        await this.api.invoke(apiOrdersIdPut, { id: this.form.id, body });
+        this.messageService.add({ severity: 'success', summary: 'Thành công', detail: 'Cập nhật đơn hàng bán thành công.', life: 3000 });
+      } else {
+        await this.api.invoke(apiOrdersPost, { body });
+        this.messageService.add({ severity: 'success', summary: 'Thành công', detail: 'Đơn hàng bán đã được tạo.', life: 3000 });
+      }
       this.dialogVisible.set(false);
       this.loadData();
       this.loadProducts();
     } catch (err) {
       console.error(err);
+      this.messageService.add({ severity: 'error', summary: 'Lỗi', detail: 'Không thể lưu đơn hàng.', life: 3000 });
+    } finally {
+      this.isSaving.set(false);
     }
   }
 }

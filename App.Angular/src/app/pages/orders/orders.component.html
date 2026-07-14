@@ -12,8 +12,8 @@
     <div class="table-toolbar">
       <div class="toolbar-left" style="gap:0.5rem">
         <div class="search-box"><i class="pi pi-search"></i><input pInputText placeholder="Tìm theo mã, tên..." [ngModel]="searchValue()" (ngModelChange)="searchValue.set($event)" style="width:200px" /></div>
-        <p-datepicker [(ngModel)]="filterFromDate" [showIcon]="true" placeholder="Từ ngày" dateFormat="dd/mm/yy" panelStyleClass="custom-datepicker-panel" />
-        <p-datepicker [(ngModel)]="filterToDate" [showIcon]="true" placeholder="Đến ngày" dateFormat="dd/mm/yy" panelStyleClass="custom-datepicker-panel" />
+        <p-datepicker [(ngModel)]="filterFromDate" [showIcon]="true" placeholder="Từ ngày" dateFormat="dd/mm/yy" panelStyleClass="custom-datepicker-panel" appendTo="body" />
+        <p-datepicker [(ngModel)]="filterToDate" [showIcon]="true" placeholder="Đến ngày" dateFormat="dd/mm/yy" panelStyleClass="custom-datepicker-panel" appendTo="body" />
         <app-searchable-select [(ngModel)]="filterCustomer" [options]="customerOptions" placeholder="Lọc khách hàng..." [showClear]="true" />
         <app-searchable-select [(ngModel)]="filterProduct" [options]="filterProductOptions" placeholder="Lọc sản phẩm..." [showClear]="true" />
         <app-searchable-select [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event)" [options]="statusOptions" [searchable]="false" placeholder="Trạng thái" style="width:140px" />
@@ -28,6 +28,7 @@
         <th pSortableColumn="discount" style="text-align:right;width:120px">Giảm giá <p-sortIcon field="discount" /></th>
         <th pSortableColumn="shippingFee" style="text-align:right;width:120px">Phí ship <p-sortIcon field="shippingFee" /></th>
         <th pSortableColumn="finalAmount" style="text-align:right;width:140px">Tổng tiền <p-sortIcon field="finalAmount" /></th>
+        <th>Ghi chú</th>
         <th style="width:130px">Trạng thái</th>
         <th style="width:80px;text-align:center">Thao tác</th>
       </tr></ng-template>
@@ -42,20 +43,30 @@
         </td>
         <td style="text-align:right">{{ formatPrice(item.shippingFee || 0) }}</td>
         <td style="text-align:right"><span class="price">{{ formatPrice(item.finalAmount) }}</span></td>
+        <td style="max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" [pTooltip]="item.note" tooltipPosition="top">{{ item.note }}</td>
         <td><p-tag [value]="getStatusLabel(item.status)" [severity]="getStatusSeverity(item.status)" /></td>
-        <td style="text-align:center"><p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="info" pTooltip="Xem chi tiết" (onClick)="viewItem(item.id)" /></td>
+        <td style="text-align:center">
+          <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="success" pTooltip="Sửa đơn hàng" (onClick)="editItem(item.id)" *ngIf="item.status <= 1" />
+          <p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="info" pTooltip="Xem chi tiết" (onClick)="viewItem(item.id)" />
+        </td>
       </tr></ng-template>
       <ng-template #emptymessage><tr><td colspan="9"><div class="empty-message"><i class="pi pi-inbox"></i><p>Chưa có đơn hàng bán nào</p></div></td></tr></ng-template>
     </p-table>
   </div>
 
-  <p-dialog [(visible)]="dialogVisible" header="🛒 Tạo đơn hàng bán" [modal]="true" [style]="{ width: '66vw' }" [draggable]="false">
+  <p-dialog [(visible)]="dialogVisible" [header]="form.id ? '🛒 Sửa đơn hàng bán' : '🛒 Tạo đơn hàng bán'" [modal]="true" [style]="{ width: '66vw' }" [draggable]="false">
     <div class="form-grid">
       <div class="form-field"><p-floatlabel variant="on"><input pInputText id="exp_code" [(ngModel)]="form.code" /><label for="exp_code">Mã đơn (tự sinh nếu để trống)</label></p-floatlabel></div>
       <div class="form-field"><p-floatlabel variant="on"><p-datepicker id="exp_date" [(ngModel)]="form.orderDate" dateFormat="dd/mm/yy" [showIcon]="true" panelStyleClass="custom-datepicker-panel" appendTo="body" /><label for="exp_date">Ngày bán</label></p-floatlabel></div>
       <div class="form-field form-field-full">
         <label class="ss-label">Khách hàng *</label>
         <app-searchable-select [(ngModel)]="form.customerId" [options]="customerOptions" placeholder="Chọn khách hàng..." />
+      </div>
+      <div class="form-field form-field-full" style="grid-column: 1 / -1; margin-top: 0.5rem">
+        <p-floatlabel variant="on">
+          <textarea pTextarea id="note" [(ngModel)]="form.note" rows="2" style="width: 100%"></textarea>
+          <label for="note">Ghi chú</label>
+        </p-floatlabel>
       </div>
     </div>
 
@@ -118,8 +129,8 @@
     </div>
 
     <ng-template #footer>
-      <p-button label="Hủy" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="dialogVisible.set(false)" />
-      <p-button label="Tạo đơn bán" icon="pi pi-check" [raised]="true" (onClick)="saveItem()" />
+      <p-button label="Hủy" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="dialogVisible.set(false)" [disabled]="isSaving()" />
+      <p-button [label]="form.id ? 'Cập nhật' : 'Tạo đơn bán'" icon="pi pi-check" [raised]="true" (onClick)="saveItem()" [loading]="isSaving()" />
     </ng-template>
   </p-dialog>
 
@@ -130,6 +141,9 @@
         <div><span style="color:var(--p-text-muted-color)">Mã đơn:</span> <strong style="color:var(--p-primary-color);font-size:1.1rem;margin-left:0.5rem">{{ viewedOrder().code }}</strong></div>
         <div><span style="color:var(--p-text-muted-color)">Ngày bán:</span> <span style="margin-left:0.5rem">{{ viewedOrder().orderDate | date:'dd/MM/yyyy HH:mm' }}</span></div>
         <div><span style="color:var(--p-text-muted-color)">Khách hàng:</span> <strong style="margin-left:0.5rem">{{ viewedOrder().customerName || 'Khách lẻ' }}</strong></div>
+        @if (viewedOrder().note) {
+          <div><span style="color:var(--p-text-muted-color)">Ghi chú:</span> <span style="margin-left:0.5rem;font-style:italic">{{ viewedOrder().note }}</span></div>
+        }
       </div>
       <div style="text-align:right;display:flex;flex-direction:column;gap:0.5rem">
         <div><p-tag [value]="getStatusLabel(viewedOrder().status)" [severity]="getStatusSeverity(viewedOrder().status)" /></div>

@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -9,30 +10,33 @@ import { TagModule } from 'primeng/tag';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { SearchableSelectComponent } from '../../shared/components/searchable-select/searchable-select.component';
+import { Api } from '../../api/api';
+import { apiDashboardGet } from '../../api/functions';
 
 // Lucide Icons
 import {
   LucideShoppingCart, LucidePackage, LucideUsers, LucideWallet,
   LucideClipboardList, LucideBarChart3,
-  LucideTrendingUp, LucideArrowUpRight,
+  LucideTrendingUp, LucideArrowUpRight, LucideArrowDownRight,
   LucideDownload, LucideUpload,
 } from '@lucide/angular';
 
 @Component({
   selector: 'app-home',
   imports: [
+    CommonModule,
     ButtonModule, CardModule, ChartModule, SelectModule, TableModule, TagModule,
     FormsModule, RouterLink, SearchableSelectComponent,
     LucideShoppingCart, LucidePackage, LucideUsers, LucideWallet,
     LucideClipboardList, LucideBarChart3,
-    LucideTrendingUp, LucideArrowUpRight,
+    LucideTrendingUp, LucideArrowUpRight, LucideArrowDownRight,
     LucideDownload, LucideUpload,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
 export class Home implements OnInit {
-  constructor(protected authService: AuthService) { }
+  constructor(protected authService: AuthService, private api: Api) { }
 
   // Period filter
   periodOptions = [
@@ -61,19 +65,37 @@ export class Home implements OnInit {
   orderStatusChartOptions: any;
 
   // Recent orders
-  recentOrders = [
-    { code: 'PX-060001', type: 2, customer: 'Nguyễn Văn An', amount: 34990000, status: 3, date: '02/06/2026' },
-    { code: 'PN-060001', type: 1, provider: 'Apple Việt Nam', amount: 900000000, status: 3, date: '01/06/2026' },
-    { code: 'PX-060002', type: 2, customer: 'Trần Thị Bình', amount: 55980000, status: 1, date: '02/06/2026' },
-    { code: 'PX-060003', type: 2, customer: 'Lê Hoàng Cường', amount: 27490000, status: 2, date: '02/06/2026' },
-    { code: 'PN-050001', type: 1, provider: 'Samsung', amount: 500000000, status: 4, date: '30/05/2026' },
-  ];
+  recentOrders = signal<any[]>([]);
+  stats = signal<any>({
+    totalOrders: 0,
+    totalProducts: 0,
+    totalCustomers: 0,
+    totalRevenue: 0,
+    totalImportMonth: 0,
+    totalExportMonth: 0,
+    estimatedProfit: 0,
+    newOrdersToday: 0
+  });
 
   ngOnInit(): void {
-    this.initRevenueChart();
-    this.initImportExportChart();
-    this.initCategoryChart();
-    this.initOrderStatusChart();
+    this.loadData();
+  }
+
+  async loadData() {
+    try {
+      const res: any = await this.api.invoke(apiDashboardGet, { period: this.selectedPeriod });
+      if (res?.data) {
+        const d = res.data;
+        this.stats.set(d);
+        this.recentOrders.set(d.recentOrders || []);
+        this.initRevenueChart(d);
+        this.initImportExportChart(d);
+        this.initCategoryChart(d);
+        this.initOrderStatusChart(d);
+      }
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   formatPrice(val: number): string {
@@ -89,18 +111,27 @@ export class Home implements OnInit {
   getTypeLabel(t: number) { return t === 1 ? 'Nhập' : 'Xuất'; }
   getTypeSeverity(t: number): 'info' | 'warn' { return t === 1 ? 'info' : 'warn'; }
   getStatusLabel(s: number) { return ['Nháp', 'Chờ xử lý', 'Xác nhận', 'Hoàn thành', 'Đã hủy'][s]; }
-  getStatusSeverity(s: number): 'secondary' | 'warn' | 'info' | 'success' | 'danger' {
+  getStatusSeverity(s: number): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
     return (['secondary', 'warn', 'info', 'success', 'danger'] as const)[s];
   }
 
-  private initRevenueChart(): void {
+  onPeriodChange(period: string) {
+    this.selectedPeriod = period;
+    this.loadData();
+  }
+
+  getAbs(val: number): number {
+    return Math.abs(val || 0);
+  }
+
+  private initRevenueChart(data: any): void {
     const months = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'];
     this.revenueChartData = {
       labels: months,
       datasets: [
         {
           label: 'Doanh thu bán hàng',
-          data: [120, 190, 150, 230, 280, 310, 0, 0, 0, 0, 0, 0].map(v => v * 1_000_000),
+          data: data.revenueByMonth || [],
           fill: true,
           borderColor: '#3b82f6',
           backgroundColor: 'rgba(59, 130, 246, 0.08)',
@@ -112,7 +143,7 @@ export class Home implements OnInit {
         },
         {
           label: 'Chi phí nhập hàng',
-          data: [80, 130, 100, 170, 200, 230, 0, 0, 0, 0, 0, 0].map(v => v * 1_000_000),
+          data: data.costByMonth || [],
           fill: true,
           borderColor: '#f59e0b',
           backgroundColor: 'rgba(245, 158, 11, 0.08)',
@@ -148,20 +179,20 @@ export class Home implements OnInit {
     };
   }
 
-  private initImportExportChart(): void {
+  private initImportExportChart(data: any): void {
     this.importExportChartData = {
-      labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'],
+      labels: data.importExportLabels || [],
       datasets: [
         {
           label: 'Nhập kho',
-          data: [15, 22, 18, 25, 30, 28],
+          data: data.importCounts || [],
           backgroundColor: '#6366f1',
           borderRadius: 6,
           barPercentage: 0.6,
         },
         {
           label: 'Xuất kho',
-          data: [12, 18, 14, 20, 25, 22],
+          data: data.exportCounts || [],
           backgroundColor: '#10b981',
           borderRadius: 6,
           barPercentage: 0.6,
@@ -182,11 +213,11 @@ export class Home implements OnInit {
     };
   }
 
-  private initCategoryChart(): void {
+  private initCategoryChart(data: any): void {
     this.categoryChartData = {
-      labels: ['Điện thoại', 'Laptop', 'Tablet', 'Phụ kiện', 'Đồng hồ'],
+      labels: data.categoryLabels || [],
       datasets: [{
-        data: [35, 25, 15, 20, 5],
+        data: data.categoryCounts || [],
         backgroundColor: ['#3b82f6', '#8b5cf6', '#f59e0b', '#10b981', '#ec4899'],
         hoverBackgroundColor: ['#2563eb', '#7c3aed', '#d97706', '#059669', '#db2777'],
         borderWidth: 0,
@@ -203,11 +234,11 @@ export class Home implements OnInit {
     };
   }
 
-  private initOrderStatusChart(): void {
+  private initOrderStatusChart(data: any): void {
     this.orderStatusChartData = {
-      labels: ['Hoàn thành', 'Chờ xử lý', 'Đã xác nhận', 'Đã hủy'],
+      labels: data.orderStatusLabels || [],
       datasets: [{
-        data: [45, 20, 25, 10],
+        data: data.orderStatusCounts || [],
         backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#ef4444'],
         hoverBackgroundColor: ['#059669', '#d97706', '#2563eb', '#dc2626'],
         borderWidth: 0,
